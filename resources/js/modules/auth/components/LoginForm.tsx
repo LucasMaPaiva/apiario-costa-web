@@ -10,21 +10,20 @@ export default function LoginForm() {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        console.log('Form submission started');
         setLoading(true);
         setError('');
 
         try {
-            console.log('Attempting login with:', { email, password });
+            console.log('Fetching CSRF cookie...');
             const data = await loginService({ email, password });
-            console.log('Login success data:', data);
+            console.log('Login successful, data:', data);
             
-            // Save token and redirect
             localStorage.setItem('auth_token', data.access_token);
-            console.log('Redirecting to /admin...');
-            window.location.href = '/admin'; 
+            window.location.assign('/admin'); 
         } catch (err: any) {
-            console.error('Login error details:', err.response?.data || err);
-            setError(err.response?.data?.message || 'Erro ao realizar login.');
+            console.error('Submission error:', err);
+            setError(err.response?.data?.message || 'Erro de conexão ou servidor.');
         } finally {
             setLoading(false);
         }

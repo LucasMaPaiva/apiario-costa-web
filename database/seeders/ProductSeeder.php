@@ -14,10 +14,10 @@ class ProductSeeder extends Seeder
      */
     public function run(): void
     {
-        $category = Category::create([
-            'name' => 'Mel e Derivados',
-            'slug' => 'mel-e-derivados',
-        ]);
+        $category = Category::updateOrCreate(
+            ['slug' => 'mel-e-derivados'],
+            ['name' => 'Mel e Derivados']
+        );
 
         $products = [
             [
@@ -47,15 +47,18 @@ class ProductSeeder extends Seeder
         ];
 
         foreach ($products as $product) {
-            $category->products()->create([
-                'name' => $product['name'],
-                'slug' => Str::slug($product['name']),
-                'description' => $product['description'],
-                'price' => $product['price'],
-                'stock' => $product['stock'],
-                'image_path' => null, // We'll handle images later
-                'is_active' => true,
-            ]);
+            Product::updateOrCreate(
+                ['slug' => Str::slug($product['name'])],
+                [
+                    'category_id' => $category->id,
+                    'name' => $product['name'],
+                    'description' => $product['description'],
+                    'price' => $product['price'],
+                    'stock' => $product['stock'],
+                    'image_path' => null,
+                    'is_active' => true,
+                ]
+            );
         }
     }
 }

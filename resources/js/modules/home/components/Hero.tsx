@@ -28,12 +28,10 @@ export default function Hero() {
 
           <div className="flex flex-col sm:flex-row gap-4">
             <a
-              href={whatsappUrl}
-              target="_blank"
-              rel="noopener noreferrer"
+              href="/loja"
               className="btn-artistic inline-flex items-center justify-center px-10 py-4 bg-brand-mel text-brand-white text-sm hover:scale-105"
             >
-              Falar no WhatsApp
+              Nossa Loja
             </a>
             <a
               href="#produtos"

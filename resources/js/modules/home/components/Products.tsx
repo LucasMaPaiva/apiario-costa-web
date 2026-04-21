@@ -86,12 +86,10 @@ export default function Products() {
 
         <div className="mt-16 text-center">
           <a
-            href={whatsappUrl}
-            target="_blank"
-            rel="noopener noreferrer"
+            href="/loja"
             className="inline-flex items-center text-brand-wine font-bold hover:text-brand-mel transition-colors"
           >
-            Ver catálogo completo no WhatsApp
+            Confira nosso catálogo completo
             <ExternalLink className="w-4 h-4 ml-2" />
           </a>
         </div>

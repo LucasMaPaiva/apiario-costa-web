@@ -16,7 +16,7 @@ class ProductController extends BaseController
     public function index(): JsonResponse
     {
         try {
-            $products = Product::with('category')->where('is_active', true)->get();
+            $products = Product::with('category')->where('is_active', '=', true)->get();
             return self::successResponse($products);
         } catch (\Exception $e) {
             return self::returnError($e);
@@ -32,7 +32,7 @@ class ProductController extends BaseController
     public function show(string $slug): JsonResponse
     {
         try {
-            $product = Product::with('category')->where('slug', $slug)->firstOrFail();
+            $product = Product::with('category')->where('slug', '=', $slug)->firstOrFail();
             return self::successResponse($product);
         } catch (\Exception $e) {
             return self::returnError($e);

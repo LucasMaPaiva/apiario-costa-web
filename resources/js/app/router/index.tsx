@@ -4,6 +4,7 @@ import MainLayout from '../../layouts/MainLayout';
 import HomePage from '../../pages/home';
 import LoginPage from '../../pages/auth/login';
 import AdminPage from '../../pages/admin';
+import StorePage from '../../pages/store';
 
 const router = createBrowserRouter([
     {
@@ -11,6 +12,14 @@ const router = createBrowserRouter([
         element: (
             <MainLayout>
                 <HomePage />
+            </MainLayout>
+        ),
+    },
+    {
+        path: '/loja',
+        element: (
+            <MainLayout>
+                <StorePage />
             </MainLayout>
         ),
     },

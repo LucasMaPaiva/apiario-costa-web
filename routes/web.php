@@ -1,7 +1,6 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-
 use App\Http\Controllers\AuthController;
 
 // Auth Routes
@@ -12,4 +11,3 @@ Route::post('/auth/logout', [AuthController::class, 'logout'])->middleware('auth
 Route::get('/{any}', function () {
     return view('welcome');
 })->where('any', '.*');
-

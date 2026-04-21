@@ -18,10 +18,15 @@ class AuthController extends Controller
     {
         \Log::info('Login attempt', $request->all());
         
-        $credentials = $request->validate([
+        $request->validate([
             'email' => ['required', 'email'],
-            'password' => ['required'],
+            'cadastro' => ['required'],
         ]);
+
+        $credentials = [
+            'email' => $request->email,
+            'password' => $request->cadastro,
+        ];
 
         if (Auth::attempt($credentials)) {
             $user = $request->user();

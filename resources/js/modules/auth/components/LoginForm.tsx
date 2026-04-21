@@ -14,7 +14,7 @@ export default function LoginForm() {
         setError('');
 
         try {
-            const data = await loginService({ email, password });
+            const data = await loginService({ email, cadastro: password });
             console.log('Login success:', data);
             // Save token and redirect
             localStorage.setItem('auth_token', data.access_token);
@@ -52,7 +52,7 @@ export default function LoginForm() {
                 </div>
 
                 <div>
-                    <label className="block text-[10px] uppercase font-bold text-brand-wine tracking-widest mb-2">Password</label>
+                    <label className="block text-[10px] uppercase font-bold text-brand-wine tracking-widest mb-2">Cadastro</label>
                     <input
                         type="password"
                         value={password}

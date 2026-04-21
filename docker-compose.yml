@@ -1,0 +1,64 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: .docker/php-fpm/Dockerfile
+    container_name: apiario-costa-app
+    restart: unless-stopped
+    volumes:
+      - .:/var/www/html
+    networks:
+      - apiario-network
+    ports:
+      - "5173:5173" # Vite (React)
+    profiles:
+      - local
+      - prod
+
+  web:
+    build:
+      context: .
+      dockerfile: .docker/nginx/Dockerfile
+    container_name: apiario-costa-web
+    restart: unless-stopped
+    ports:
+      - "${APP_PORT:-8000}:80"
+    volumes:
+      - .:/var/www/html
+    depends_on:
+      - app
+    networks:
+      - apiario-network
+      - npm-network
+    profiles:
+      - local
+      - prod
+
+  db:
+    build:
+      context: .
+      dockerfile: .docker/pgsql/Dockerfile
+    container_name: apiario-costa-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${DB_DATABASE:-apiario}
+      POSTGRES_USER: ${DB_USERNAME:-apiario}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-apiario}
+    ports:
+      - "${FORWARD_DB_PORT:-5432}:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - apiario-network
+    profiles:
+      - local
+
+networks:
+  apiario-network:
+    driver: bridge
+  npm-network:
+    name: nginx-proxy-manager
+    external: true
+
+volumes:
+  pgdata:

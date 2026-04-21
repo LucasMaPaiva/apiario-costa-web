@@ -1,0 +1,44 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Montserrat:wght@300;400;600&display=swap');
+@import "tailwindcss";
+
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+@source '../**/*.blade.php';
+@source '../**/*.php';
+@source '../**/*.js';
+@source '../**/*.jsx';
+@source '../**/*.ts';
+@source '../**/*.tsx';
+
+@theme {
+  --font-serif: "Playfair Display", serif;
+  --font-sans: "Montserrat", sans-serif;
+
+  --color-brand-mel: #FFA400;
+  --color-brand-wine: #8B3F3F;
+  --color-brand-gold: #F9B63C;
+  --color-brand-dark: #1A1A1A;
+  --color-brand-white: #FFFFFF;
+  --color-brand-bg: #FAFAFA;
+}
+
+@layer base {
+  body {
+    @apply font-sans text-brand-dark bg-brand-bg leading-relaxed;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-serif font-bold text-brand-dark;
+  }
+}
+
+.artistic-line {
+  @apply w-1 bg-brand-mel h-24;
+}
+
+.btn-artistic {
+  @apply rounded-[4px] uppercase tracking-widest font-semibold transition-all duration-300;
+}
+
+.honeycomb-pattern {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='100' viewBox='0 0 56 100'%3E%3Cpath d='M28 66L0 50L0 16L28 0L56 16L56 50L28 66L28 100' fill='none' stroke='%23FFA400' stroke-width='1'/%3E%3C/svg%3E");
+}

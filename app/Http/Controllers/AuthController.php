@@ -2,13 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Base\Http\Controllers\BaseController;
 use App\Http\Requests\Auth\LoginRequest;
 use App\Services\AuthService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
 
-class AuthController extends Controller
+class AuthController extends BaseController
 {
     /**
      * @param AuthService $authService
@@ -28,13 +28,9 @@ class AuthController extends Controller
         try {
             $data = $this->authService->login($request->validated());
 
-            return response()->json($data);
+            return self::successResponse($data, 'Login realizado com sucesso.');
         } catch (\Exception $e) {
-            Log::error('Login unexpected error: ' . $e->getMessage());
-            
-            return response()->json([
-                'message' => $e->getMessage(),
-            ], 401);
+            return self::returnError($e);
         }
     }
 
@@ -49,13 +45,9 @@ class AuthController extends Controller
         try {
             $this->authService->logout();
 
-            return response()->json([
-                'message' => 'Sessão encerrada com sucesso.',
-            ]);
+            return self::successResponse(null, 'Sessão encerrada com sucesso.');
         } catch (\Exception $e) {
-            return response()->json([
-                'message' => 'Erro ao encerrar sessão.',
-            ], 500);
+            return self::returnError($e);
         }
     }
 }

@@ -1,0 +1,26 @@
+# Laravel Architectural Rules (Apiário Costa)
+
+## 🛠 Services
+- **Single Responsibility Principle (SRP)**: Each service must handle only one specific action or domain logic piece.
+- **Naming Convention**: Use descriptive names based on the action (e.g., `LoginService`, `LogoutService`, `ProcessOrderService`).
+- **Structure**:
+    - Services should be located in `app/Services/{Module}/`.
+    - Every service must have an `execute()` method as its main entry point.
+- **Injection**:
+    - Always prefer **Method Injection** in Controllers for services.
+    - Do not manually instantiate services using `new Service()`.
+    - If needed outside of injection, use the service container via `app(ServiceName::class)`.
+
+## 🕹 Controllers
+- **Thin Controllers**: Controllers must NOT contain business logic. Their role is strictly to:
+    1. Validate/receive the request.
+    2. Call the appropriate Service.
+    3. Return a standardized response.
+- **Base Architecture**:
+    - Every controller must extend `App\Base\Http\Controllers\BaseController`.
+    - Use the `Response` trait methods for all API returns:
+        - `self::successResponse($data, $message)` for successful operations.
+        - `self::returnError($exception)` for catching and returning handled exceptions.
+
+## 📝 Requests
+- Create dedicated `FormRequest` classes for validation logic (e.g., `app/Http/Requests/Auth/LoginRequest.php`).

@@ -14,7 +14,7 @@ export default function LoginForm() {
         setError('');
 
         try {
-            const data = await loginService({ email, cadastro: password });
+            const data = await loginService({ email, password });
             console.log('Login success:', data);
             // Save token and redirect
             localStorage.setItem('auth_token', data.access_token);

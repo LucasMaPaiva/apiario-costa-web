@@ -2,60 +2,60 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\Auth\LoginRequest;
+use App\Services\AuthService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use App\Models\User;
+use Illuminate\Support\Facades\Log;
 
 class AuthController extends Controller
 {
     /**
+     * @param AuthService $authService
+     */
+    public function __construct(
+        protected AuthService $authService
+    ) {}
+
+    /**
      * Handle an authentication attempt.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
+     * @param LoginRequest $request
+     * @return JsonResponse
      */
-    public function login(Request $request)
+    public function login(LoginRequest $request): JsonResponse
     {
-        \Log::info('Login attempt', $request->all());
-        
-        $request->validate([
-            'email' => ['required', 'email'],
-            'cadastro' => ['required'],
-        ]);
+        try {
+            $data = $this->authService->login($request->validated());
 
-        $credentials = [
-            'email' => $request->email,
-            'password' => $request->cadastro,
-        ];
-
-        if (Auth::attempt($credentials)) {
-            $user = $request->user();
-            $token = $user->createToken('auth-token')->plainTextToken;
-
+            return response()->json($data);
+        } catch (\Exception $e) {
+            Log::error('Login unexpected error: ' . $e->getMessage());
+            
             return response()->json([
-                'access_token' => $token,
-                'token_type' => 'Bearer',
-                'user' => $user,
-            ]);
+                'message' => $e->getMessage(),
+            ], 401);
         }
-
-        return response()->json([
-            'message' => 'Credenciais inválidas.',
-        ], 401);
     }
 
     /**
-     * Log the user out (Revoke the token).
+     * Log the user out.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
+     * @param Request $request
+     * @return JsonResponse
      */
-    public function logout(Request $request)
+    public function logout(Request $request): JsonResponse
     {
-        $request->user()->currentAccessToken()->delete();
+        try {
+            $this->authService->logout();
 
-        return response()->json([
-            'message' => 'Sessão encerrada com sucesso.',
-        ]);
+            return response()->json([
+                'message' => 'Sessão encerrada com sucesso.',
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Erro ao encerrar sessão.',
+            ], 500);
+        }
     }
 }

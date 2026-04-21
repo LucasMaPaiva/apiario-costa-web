@@ -10,3 +10,4 @@ Route::get('/user', function (Request $request) {
 
 Route::get('/products', [ProductController::class, 'index']);
 Route::get('/products/{slug}', [ProductController::class, 'show']);
+Route::get('/categories', [App\Http\Controllers\CategoryController::class, 'index']);

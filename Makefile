@@ -34,6 +34,12 @@ logs:
 migrate:
 	docker compose exec app php artisan migrate
 
+migrate-fresh:
+	docker compose exec app php artisan migrate:fresh
+
+seed:
+	docker compose exec app php artisan db:seed
+
 tinker:
 	docker compose exec app php artisan tinker
 

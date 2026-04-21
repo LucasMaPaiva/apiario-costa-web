@@ -1,21 +1,20 @@
 <?php
 
-namespace App\Services;
+namespace App\Services\Auth;
 
-use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
 
-class AuthService
+class LoginService
 {
     /**
-     * Handle the authentication logic.
+     * Handle the login logic.
      *
      * @param array $credentials
      * @return array
      * @throws ValidationException
      */
-    public function login(array $credentials): array
+    public function execute(array $credentials): array
     {
         if (!Auth::attempt($credentials)) {
             throw ValidationException::withMessages([
@@ -24,8 +23,6 @@ class AuthService
         }
 
         $user = Auth::user();
-        
-        // Ensure tokens can be created if needed
         $token = $user->createToken('auth-token')->plainTextToken;
 
         return [
@@ -33,19 +30,5 @@ class AuthService
             'token_type' => 'Bearer',
             'user' => $user,
         ];
-    }
-
-    /**
-     * Handle logout.
-     *
-     * @return void
-     */
-    public function logout(): void
-    {
-        $user = Auth::user();
-        if ($user) {
-            $user->currentAccessToken()?->delete();
-            Auth::guard('web')->logout();
-        }
     }
 }

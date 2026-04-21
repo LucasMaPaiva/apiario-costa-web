@@ -4,31 +4,26 @@ namespace App\Http\Controllers;
 
 use App\Base\Http\Controllers\BaseController;
 use App\Http\Requests\Auth\LoginRequest;
-use App\Services\AuthService;
+use App\Services\Auth\LoginService;
+use App\Services\Auth\LogoutService;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 
 class AuthController extends BaseController
 {
     /**
-     * @param AuthService $authService
-     */
-    public function __construct(
-        protected AuthService $authService
-    ) {}
-
-    /**
      * Handle an authentication attempt.
      *
      * @param LoginRequest $request
+     * @param LoginService $service
      * @return JsonResponse
      */
-    public function login(LoginRequest $request): JsonResponse
+    public function login(LoginRequest $request, LoginService $service): JsonResponse
     {
         try {
-            $data = $this->authService->login($request->validated());
-
-            return self::successResponse($data, 'Login realizado com sucesso.');
+            return self::successResponse(
+                $service->execute($request->validated()),
+                'Login realizado com sucesso.'
+            );
         } catch (\Exception $e) {
             return self::returnError($e);
         }
@@ -37,15 +32,16 @@ class AuthController extends BaseController
     /**
      * Log the user out.
      *
-     * @param Request $request
+     * @param LogoutService $service
      * @return JsonResponse
      */
-    public function logout(Request $request): JsonResponse
+    public function logout(LogoutService $service): JsonResponse
     {
         try {
-            $this->authService->logout();
-
-            return self::successResponse(null, 'Sessão encerrada com sucesso.');
+            return self::successResponse(
+                data: $service->execute(), 
+                message: 'Sessão encerrada com sucesso.'
+            );
         } catch (\Exception $e) {
             return self::returnError($e);
         }

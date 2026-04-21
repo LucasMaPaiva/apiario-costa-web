@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const httpClient = axios.create({
-    baseURL: '/api',
+    baseURL: '/', // Use root for WEB routes
     withCredentials: true,
     headers: {
         'X-Requested-With': 'XMLHttpRequest',

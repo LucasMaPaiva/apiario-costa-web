@@ -3,6 +3,7 @@ import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import MainLayout from '../../layouts/MainLayout';
 import HomePage from '../../pages/home';
 import LoginPage from '../../pages/auth/login';
+import AdminPage from '../../pages/admin';
 
 const router = createBrowserRouter([
     {
@@ -16,6 +17,10 @@ const router = createBrowserRouter([
     {
         path: '/laravel-admin',
         element: <LoginPage />,
+    },
+    {
+        path: '/admin',
+        element: <AdminPage />,
     },
 ]);
 

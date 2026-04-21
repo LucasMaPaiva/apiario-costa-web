@@ -14,12 +14,16 @@ export default function LoginForm() {
         setError('');
 
         try {
+            console.log('Attempting login with:', { email, password });
             const data = await loginService({ email, password });
-            console.log('Login success:', data);
+            console.log('Login success data:', data);
+            
             // Save token and redirect
             localStorage.setItem('auth_token', data.access_token);
-            window.location.href = '/'; // Simple redirect for now
+            console.log('Redirecting to /admin...');
+            window.location.href = '/admin'; 
         } catch (err: any) {
+            console.error('Login error details:', err.response?.data || err);
             setError(err.response?.data?.message || 'Erro ao realizar login.');
         } finally {
             setLoading(false);

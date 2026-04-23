@@ -1,0 +1,129 @@
+Project apiario_costa_web {
+  database_type: "PostgreSQL"
+  Note: "Schema expandido para loja com carrinho anonimo, opcional vinculacao futura a usuario e checkout com dados do comprador."
+}
+
+Table users {
+  id bigint [pk, increment]
+  name varchar [not null]
+  email varchar [not null, unique]
+  email_verified_at timestamp
+  password varchar [not null]
+  remember_token varchar
+  created_at timestamp
+  updated_at timestamp
+
+  Note: "Pode ser usado no futuro para cliente logado e hoje ja atende o admin."
+}
+
+Table categories {
+  id bigint [pk, increment]
+  name varchar [not null]
+  slug varchar [not null, unique]
+  created_at timestamp
+  updated_at timestamp
+}
+
+Table products {
+  id bigint [pk, increment]
+  category_id bigint [not null]
+  name varchar [not null]
+  slug varchar [not null, unique]
+  description text
+  price decimal(10,2) [not null]
+  image_path varchar
+  stock integer [not null, default: 0]
+  is_active boolean [not null, default: true]
+  created_at timestamp
+  updated_at timestamp
+}
+
+Table product_images {
+  id bigint [pk, increment]
+  product_id bigint [not null]
+  path varchar [not null]
+  sort_order integer [not null, default: 0]
+  created_at timestamp
+  updated_at timestamp
+}
+
+Table carts {
+  id bigint [pk, increment]
+  uuid uuid [not null, unique]
+  user_id bigint
+  session_id varchar
+  status varchar [not null, default: 'active'] // active, converted, abandoned
+  created_at timestamp
+  updated_at timestamp
+
+  Note: "Carrinho começa anonimo. Se o usuario logar depois, pode ser vinculado via user_id."
+}
+
+Table cart_items {
+  id bigint [pk, increment]
+  cart_id bigint [not null]
+  product_id bigint [not null]
+  quantity integer [not null]
+  unit_price decimal(10,2) [not null]
+  subtotal decimal(10,2) [not null]
+  created_at timestamp
+  updated_at timestamp
+}
+
+Table orders {
+  id bigint [pk, increment]
+  uuid uuid [not null, unique]
+  cart_id bigint
+  user_id bigint
+  customer_name varchar [not null]
+  customer_email varchar [not null]
+  customer_phone varchar
+  customer_cpf varchar(14) [not null]
+  status varchar [not null, default: 'pending'] // pending, paid, failed, cancelled, expired
+  payment_status varchar [not null, default: 'pending'] // pending, approved, rejected, refunded
+  subtotal decimal(10,2) [not null, default: 0]
+  total decimal(10,2) [not null, default: 0]
+  mercado_pago_payment_id varchar
+  mercado_pago_preference_id varchar
+  paid_at timestamp
+  created_at timestamp
+  updated_at timestamp
+
+  Note: "Pedido guarda snapshot do comprador. user_id e opcional."
+}
+
+Table order_items {
+  id bigint [pk, increment]
+  order_id bigint [not null]
+  product_id bigint [not null]
+  product_name varchar [not null]
+  quantity integer [not null]
+  unit_price decimal(10,2) [not null]
+  subtotal decimal(10,2) [not null]
+  created_at timestamp
+  updated_at timestamp
+}
+
+Table payment_webhooks {
+  id bigint [pk, increment]
+  provider varchar [not null, default: 'mercado_pago']
+  event_type varchar
+  external_id varchar
+  payload_json jsonb [not null]
+  processed_at timestamp
+  created_at timestamp
+  updated_at timestamp
+}
+
+Ref: products.category_id > categories.id [delete: cascade]
+Ref: product_images.product_id > products.id [delete: cascade]
+
+Ref: carts.user_id > users.id [delete: set null]
+Ref: cart_items.cart_id > carts.id [delete: cascade]
+Ref: cart_items.product_id > products.id [delete: restrict]
+
+Ref: orders.cart_id > carts.id [delete: set null]
+Ref: orders.user_id > users.id [delete: set null]
+
+Ref: order_items.order_id > orders.id [delete: cascade]
+Ref: order_items.product_id > products.id [delete: restrict]

@@ -24,6 +24,8 @@ class StoreOrderRequest extends FormRequest
             'neighborhood' => ['required', 'string'],
             'city' => ['required', 'string'],
             'state' => ['required', 'string'],
+            'shipping_method' => ['nullable', 'string'],
+            'shipping_cost' => ['nullable', 'numeric'],
         ];
     }
 }

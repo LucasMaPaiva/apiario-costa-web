@@ -1,14 +1,17 @@
-import { motion } from "motion/react";
-import { ShoppingCart, Menu, X, ShoppingBag, Sun, Moon } from "lucide-react";
+import { AnimatePresence, motion } from "motion/react";
+import { ShoppingCart, Menu, X, ShoppingBag, Sun, Moon, User, LogOut, ChevronDown, Shield, MapPin } from "lucide-react";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useCart } from "../../../modules/cart/context/CartContext";
 import { useTheme } from "../../context/ThemeContext";
+import { useAuth } from "../../../modules/auth/context/AuthContext";
 
 export default function Navbar() {
   const [is_open, set_is_open] = useState(false);
+  const [is_profile_open, set_is_profile_open] = useState(false);
   const { cart_count, setIsCartOpen } = useCart();
   const { theme, toggleTheme } = useTheme();
+  const { user, logout } = useAuth();
 
   const menu_items = [
     { name: "Início", href: "/#home" },
@@ -37,7 +40,8 @@ export default function Navbar() {
                 {item.name}
               </a>
             ))}
-            <div className="flex items-center gap-2">
+            
+            <div className="flex items-center gap-2 border-l border-border pl-6">
               <button
                 onClick={() => setIsCartOpen(true)}
                 className="relative p-2 text-text-primary hover:text-brand-mel transition-colors"
@@ -57,15 +61,93 @@ export default function Navbar() {
               >
                 {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
               </button>
-            </div>
 
-            <Link
-              to="/loja"
-              className="inline-flex items-center px-6 py-2 rounded-full bg-brand-wine text-brand-white text-xs font-bold hover:bg-brand-dark transition-all gap-2"
-            >
-              <ShoppingCart className="w-4 h-4" />
-              LOJA
-            </Link>
+              {/* User Dropdown */}
+              <div className="relative">
+                {user ? (
+                  <>
+                    <button 
+                      onClick={() => set_is_profile_open(!is_profile_open)}
+                      className="w-10 h-10 bg-brand-mel/10 rounded-full flex items-center justify-center text-brand-mel border border-brand-mel/20 hover:bg-brand-mel hover:text-white transition-all ml-2"
+                    >
+                      <User size={18} />
+                    </button>
+
+                    <AnimatePresence>
+                      {is_profile_open && (
+                        <>
+                          <div className="fixed inset-0" onClick={() => set_is_profile_open(false)}></div>
+                          <motion.div
+                            initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                            animate={{ opacity: 1, y: 0, scale: 1 }}
+                            exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                            className="absolute right-0 mt-3 w-56 bg-surface border border-border rounded-2xl shadow-2xl p-4 overflow-hidden"
+                          >
+                            <div className="mb-4 pb-4 border-b border-border">
+                              <p className="text-[10px] font-black text-text-secondary uppercase tracking-widest mb-1">Logado como</p>
+                              <p className="text-sm font-black text-text-primary italic truncate">{user.name}</p>
+                            </div>
+                            <div className="space-y-2">
+                              {user.is_admin && (
+                                <Link 
+                                  to="/admin" 
+                                  onClick={() => set_is_profile_open(false)}
+                                  className="flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-black text-brand-wine bg-brand-wine/5 hover:bg-brand-wine hover:text-white transition-all mb-2"
+                                >
+                                  <Shield size={16} /> Painel Admin
+                                </Link>
+                              )}
+                              <Link 
+                                to="/meus-pedidos" 
+                                className="flex items-center gap-3 w-full px-4 py-3 text-xs font-bold text-text-secondary hover:text-brand-mel hover:bg-brand-mel/5 transition-all"
+                                onClick={() => set_is_profile_open(false)}
+                              >
+                                <ShoppingBag size={16} /> Meus Pedidos
+                              </Link>
+                              <Link 
+                                to="/enderecos" 
+                                className="flex items-center gap-3 w-full px-4 py-3 text-xs font-bold text-text-secondary hover:text-brand-mel hover:bg-brand-mel/5 transition-all"
+                                onClick={() => set_is_profile_open(false)}
+                              >
+                                <MapPin size={16} /> Meus Endereços
+                              </Link>
+                              <Link 
+                                to="/perfil" 
+                                className="flex items-center gap-3 w-full px-4 py-3 text-xs font-bold text-text-secondary hover:text-brand-mel hover:bg-brand-mel/5 transition-all"
+                                onClick={() => set_is_profile_open(false)}
+                              >
+                                <User size={16} /> Configurações
+                              </Link>
+                              <button 
+                                onClick={() => { logout(); set_is_profile_open(false); }}
+                                className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-bold text-brand-wine hover:bg-brand-wine/5 transition-all"
+                              >
+                                <LogOut size={16} /> Sair da Conta
+                              </button>
+                            </div>
+                          </motion.div>
+                        </>
+                      )}
+                    </AnimatePresence>
+                  </>
+                ) : (
+                  <Link
+                    to="/login"
+                    className="ml-4 text-[10px] font-bold uppercase tracking-[0.2em] text-brand-dark hover:text-brand-mel transition-colors"
+                  >
+                    Entrar
+                  </Link>
+                )}
+              </div>
+
+              <Link
+                to="/loja"
+                className="ml-6 inline-flex items-center px-6 py-2 rounded-full bg-brand-wine text-brand-white text-xs font-bold hover:bg-brand-dark transition-all gap-2"
+              >
+                <ShoppingCart className="w-4 h-4" />
+                LOJA
+              </Link>
+            </div>
           </div>
 
           {/* Mobile buttons */}

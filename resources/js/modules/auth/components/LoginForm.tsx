@@ -20,7 +20,15 @@ export default function LoginForm() {
             console.log('Login successful, response:', response);
             
             localStorage.setItem('auth_token', response.data.access_token);
-            window.location.assign('/admin'); 
+            
+            // Check if user is admin based on the login response
+            const isAdmin = response.data.user.roles?.some((r: any) => r.name === 'admin') || false;
+            
+            if (isAdmin) {
+                window.location.assign('/admin');
+            } else {
+                window.location.assign('/loja');
+            }
         } catch (err: any) {
             console.error('Submission error:', err);
             setError(err.response?.data?.message || 'Erro de conexão ou servidor.');

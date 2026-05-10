@@ -35,7 +35,8 @@ class OrderController extends BaseController
     public function index(): JsonResponse
     {
         try {
-            $orders = Auth::user()->orders()->with('items.product')->orderBy('id', 'desc')->get();
+            $user = \App\Models\User::find(Auth::id());
+            $orders = $user->orders()->with('items.product')->orderBy('id', 'desc')->get();
             return self::successResponse($orders);
         } catch (\Exception $e) {
             return self::returnError($e);
@@ -60,21 +61,51 @@ class OrderController extends BaseController
     }
 
     /**
+     * Display the specified order (Client).
+     *
+     * @param int $id
+     * @return JsonResponse
+     */
+    public function show(int $id): JsonResponse
+    {
+        try {
+            $user = \App\Models\User::find(Auth::id());
+            $order = $user->orders()->with('items.product')->findOrFail($id);
+            return self::successResponse($order);
+        } catch (\Exception $e) {
+            return self::returnError($e);
+        }
+    }
+
+    /**
+     * Display the specified order (Admin).
+     *
+     * @param int $id
+     * @return JsonResponse
+     */
+    public function adminShow(int $id): JsonResponse
+    {
+        try {
+            $order = \App\Models\Order::with(['user', 'items.product'])->findOrFail($id);
+            return self::successResponse($order);
+        } catch (\Exception $e) {
+            return self::returnError($e);
+        }
+    }
+
+    /**
      * Update order status.
      *
      * @param int $id
-     * @param Request $request
+     * @param \Illuminate\Http\Request $request
      * @return JsonResponse
      */
     public function updateStatus(int $id, \Illuminate\Http\Request $request): JsonResponse
     {
         try {
             $order = \App\Models\Order::findOrFail($id);
-            $order->update([
-                'status' => $request->status,
-                'payment_status' => $request->payment_status ?? $order->payment_status
-            ]);
-            return self::successResponse($order, 'Status do pedido atualizado.');
+            $order->update($request->only(['status', 'payment_status', 'tracking_code']));
+            return self::successResponse($order, 'Pedido atualizado com sucesso.');
         } catch (\Exception $e) {
             return self::returnError($e);
         }

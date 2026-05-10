@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { useAdminOrders } from '../../../modules/admin/hooks/useAdminOrders';
 import { ShoppingBag, User, Calendar, MapPin, Eye, ExternalLink } from 'lucide-react';
 
@@ -80,12 +81,13 @@ export default function AdminOrdersList() {
                                     </td>
                                     <td className="px-8 py-6">
                                         <div className="flex items-center gap-2">
-                                            <button 
+                                            <Link 
+                                                to={`/admin/pedidos/${order.id}`}
                                                 title="Ver Detalhes"
                                                 className="p-2.5 bg-bg-main border border-border rounded-lg text-text-secondary hover:text-brand-mel transition-all"
                                             >
                                                 <Eye size={16} />
-                                            </button>
+                                            </Link>
                                             <select 
                                                 value={order.status}
                                                 onChange={(e) => handleUpdateStatus(order.id, e.target.value)}

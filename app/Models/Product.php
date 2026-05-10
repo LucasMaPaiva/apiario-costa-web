@@ -1,10 +1,10 @@
 <?php
-
+ 
 namespace App\Models;
-
+ 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-
+ 
 class Product extends Model
 {
     protected $fillable = [
@@ -22,6 +22,21 @@ class Product extends Model
         'length'
     ];
 
+    protected $appends = ['image_url'];
+
+    public function getImageUrlAttribute()
+    {
+        if (!$this->image_path) return '/placeholder.jpg';
+        if (str_starts_with($this->image_path, 'http')) return $this->image_path;
+        
+        $path = ltrim($this->image_path, '/');
+        if (str_starts_with($path, 'storage/')) {
+            return asset($path);
+        }
+        
+        return asset('storage/' . $path);
+    }
+ 
     /**
      * Get the category that owns the product.
      */
@@ -29,7 +44,7 @@ class Product extends Model
     {
         return $this->belongsTo(Category::class);
     }
-
+ 
     /**
      * Get the images for the product.
      */

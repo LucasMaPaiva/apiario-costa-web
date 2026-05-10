@@ -6,6 +6,7 @@ import { createRoot } from 'react-dom/client';
 import AppRouter from './app/router';
 import { ThemeProvider } from './common/context/ThemeContext';
 import { CartProvider } from './modules/cart/context/CartContext';
+import { AuthProvider } from './modules/auth/context/AuthContext';
 
 const rootElement = document.getElementById('app');
 if (rootElement) {
@@ -14,7 +15,9 @@ if (rootElement) {
         <React.StrictMode>
             <ThemeProvider>
                 <CartProvider>
-                    <AppRouter />
+                    <AuthProvider>
+                        <AppRouter />
+                    </AuthProvider>
                 </CartProvider>
             </ThemeProvider>
         </React.StrictMode>

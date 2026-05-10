@@ -22,9 +22,14 @@ export default function AdminIntegrations() {
         loadIntegration();
     }, []);
 
-    const handleConnect = () => {
-        // Redireciona para a rota do Laravel que inicia o OAuth
-        window.location.href = '/api/admin/integrations/melhor-envio/redirect';
+    const handleConnect = async () => {
+        try {
+            // Busca a URL de redirecionamento via API autenticada
+            const response = await httpClient.get('/api/admin/integrations/melhor-envio/redirect-url');
+            window.location.href = response.data.data.url;
+        } catch (error) {
+            alert('Erro ao iniciar conexão com Melhor Envio.');
+        }
     };
 
     if (loading) return <div className="p-20 text-center text-text-secondary">Carregando configurações...</div>;

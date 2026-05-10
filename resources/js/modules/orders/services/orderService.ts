@@ -18,12 +18,12 @@ export interface OrderData {
 
 export const createOrder = async (order_data: OrderData) => {
     const response = await httpClient.post('/api/orders', order_data);
-    return response.data;
+    return response.data.data;
 };
 
 export const fetchUserOrders = async () => {
     const response = await httpClient.get('/api/orders');
-    return response.data;
+    return response.data.data;
 };
 
 export const calculateShipping = async (cep: string, items: any[]) => {

@@ -38,6 +38,19 @@ class IntegrationController extends Controller
     }
 
     /**
+     * Retorna a URL de redirecionamento para o frontend iniciar o OAuth
+     */
+    public function getRedirectUrl()
+    {
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'url' => $this->melhorEnvio->getAuthorizationUrl()
+            ]
+        ]);
+    }
+
+    /**
      * Redireciona para o Melhor Envio para autorização
      */
     public function redirect()

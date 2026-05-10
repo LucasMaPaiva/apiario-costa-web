@@ -35,6 +35,9 @@ class StoreOrderService
                 ];
             }
 
+            $shipping_cost = (float) ($data['shipping_cost'] ?? 0);
+            $total_amount += $shipping_cost;
+
             $order = Order::create([
                 'user_id' => Auth::id(),
                 'total_amount' => $total_amount,
@@ -46,10 +49,23 @@ class StoreOrderService
                 'neighborhood' => $data['neighborhood'],
                 'city' => $data['city'],
                 'state' => $data['state'],
+                'shipping_method' => $data['shipping_method'] ?? null,
+                'shipping_cost' => $shipping_cost,
+                'payment_status' => 'pending',
             ]);
 
             foreach ($items_to_create as $item) {
                 $order->items()->create($item);
+                
+                $product = Product::find($item['product_id']);
+                if ($product) {
+                    $product->decrement('stock', $item['quantity']);
+                    
+                    // Se o estoque chegar a 0, desativa o produto
+                    if ($product->fresh()->stock <= 0) {
+                        $product->update(['is_active' => false]);
+                    }
+                }
             }
 
             return $order->load('items.product');

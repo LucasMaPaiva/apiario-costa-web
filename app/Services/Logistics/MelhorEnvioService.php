@@ -107,7 +107,13 @@ class MelhorEnvioService
      */
     public function calculate(string $toZipCode, array $products): array
     {
-        $fromZipCode = \App\Models\Setting::getValue('store_cep');
+        $storeAddress = \App\Models\Setting::getValue('store_address');
+        $fromZipCode = null;
+
+        if ($storeAddress) {
+            $addressData = json_decode($storeAddress, true);
+            $fromZipCode = $addressData['cep'] ?? null;
+        }
 
         if (!$fromZipCode) {
             throw new \Exception('CEP de origem não configurado nas configurações da loja.');

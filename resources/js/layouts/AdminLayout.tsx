@@ -66,15 +66,15 @@ export default function AdminLayout() {
                         Categorias
                     </Link>
                     <Link
-                        to="/admin/logistica"
+                        to="/admin/configuracoes"
                         className={`flex items-center gap-4 px-5 py-4 rounded-2xl text-sm font-bold transition-all duration-300 group ${
-                            isActive('/admin/logistica')
+                            isActive('/admin/configuracoes')
                                 ? 'bg-brand-mel text-white shadow-xl shadow-brand-mel/20 translate-x-1'
                                 : 'text-sidebar-text hover:bg-brand-mel/10 hover:text-brand-mel'
                         }`}
                     >
-                        <Truck size={20} className={isActive('/admin/logistica') ? 'animate-bounce' : 'group-hover:scale-110 transition-transform'} />
-                        Logística
+                        <Truck size={20} className={isActive('/admin/configuracoes') ? 'animate-bounce' : 'group-hover:scale-110 transition-transform'} />
+                        Configurações
                     </Link>
                     <div className="pt-6 pb-2 px-5">
                         <span className="text-[10px] font-black text-text-secondary uppercase tracking-[0.25em] opacity-50">Gestão de Vendas</span>

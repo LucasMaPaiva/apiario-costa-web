@@ -2,6 +2,8 @@
 
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\Admin\IntegrationController;
+use App\Http\Controllers\Admin\SettingsController;
+use App\Http\Controllers\ShippingController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -12,6 +14,7 @@ Route::get('/user', function (Request $request) {
 Route::get('/products', [ProductController::class, 'index']);
 Route::get('/products/{slug}', [ProductController::class, 'show']);
 Route::get('/categories', [App\Http\Controllers\CategoryController::class, 'index']);
+Route::post('/shipping/calculate', [ShippingController::class, 'calculate']);
 
 // Auth Routes
 Route::post('/auth/login', [App\Http\Controllers\AuthController::class, 'login'])->middleware('throttle:6,1');
@@ -39,6 +42,10 @@ Route::middleware(['auth:sanctum', 'role:admin|employee'])->prefix('admin')->gro
     // Integrações
     Route::get('/integrations/melhor-envio', [IntegrationController::class, 'index']);
     Route::get('/integrations/melhor-envio/redirect', [IntegrationController::class, 'redirect']);
+
+    // Configurações
+    Route::get('/settings/store-address', [SettingsController::class, 'getStoreAddress']);
+    Route::post('/settings/store-address', [SettingsController::class, 'updateStoreAddress']);
 });
 
 // Callback da Integração (Público pois é um redirecionamento externo)

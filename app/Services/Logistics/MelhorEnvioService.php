@@ -83,6 +83,73 @@ class MelhorEnvioService
     }
 
     /**
+     * Retorna um Access Token válido, renovando-o se necessário.
+     */
+    protected function getAccessToken(): string
+    {
+        $integration = Integration::where('provider', 'melhor-envio')->firstOrFail();
+
+        if ($integration->expires_at->isPast()) {
+            $tokens = $this->refreshToken($integration->refresh_token);
+            
+            $integration->update([
+                'access_token' => $tokens['access_token'],
+                'refresh_token' => $tokens['refresh_token'],
+                'expires_at' => Carbon::now()->addSeconds($tokens['expires_in']),
+            ]);
+        }
+
+        return $integration->access_token;
+    }
+
+    /**
+     * Calcula o frete para um destino e lista de produtos.
+     */
+    public function calculate(string $toZipCode, array $products): array
+    {
+        $fromZipCode = \App\Models\Setting::getValue('store_cep');
+
+        if (!$fromZipCode) {
+            throw new \Exception('CEP de origem não configurado nas configurações da loja.');
+        }
+
+        $token = $this->getAccessToken();
+
+        $response = Http::withToken($token)
+            ->withHeaders(['User-Agent' => config('app.name') . ' (contato@dominio.com)'])
+            ->post("{$this->baseUrl}/api/v2/me/shipment/calculate", [
+                'from' => ['postal_code' => $fromZipCode],
+                'to' => ['postal_code' => $toZipCode],
+                'products' => $this->mapProducts($products),
+            ]);
+
+        if ($response->failed()) {
+            Log::error('Melhor Envio Calculate Error: ' . $response->body());
+            return [];
+        }
+
+        return $response->json();
+    }
+
+    /**
+     * Mapeia os produtos para o formato esperado pelo Melhor Envio.
+     */
+    protected function mapProducts(array $products): array
+    {
+        return array_map(function ($item) {
+            return [
+                'id' => $item['id'],
+                'width' => $item['width'] ?? 10,
+                'height' => $item['height'] ?? 10,
+                'length' => $item['length'] ?? 10,
+                'weight' => $item['weight'] ?? 0.5,
+                'insurance_value' => $item['price'] ?? 0,
+                'quantity' => $item['quantity'] ?? 1,
+            ];
+        }, $products);
+    }
+
+    /**
      * Busca dados do usuário (Lojista) para confirmar conexão
      */
     public function getUserData(string $token): array

@@ -15,7 +15,7 @@ import AdminProductCreate from '../../pages/admin/products/create';
 import AdminProductEdit from '../../pages/admin/products/edit';
 import AdminCategoriesList from '../../pages/admin/categories/index';
 import AdminOrdersList from '../../pages/admin/orders/index';
-import AdminIntegrations from '../../pages/admin/settings/Integrations';
+import AdminSettings from '../../pages/admin/settings/index';
 
 const router = createBrowserRouter([
     {
@@ -87,8 +87,8 @@ const router = createBrowserRouter([
                 element: <AdminOrdersList />
             },
             {
-                path: 'logistica',
-                element: <AdminIntegrations />
+                path: 'configuracoes',
+                element: <AdminSettings />
             }
         ]
     },

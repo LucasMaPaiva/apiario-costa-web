@@ -12,6 +12,8 @@ export interface OrderData {
     neighborhood: string;
     city: string;
     state: string;
+    shipping_method?: string;
+    shipping_cost?: number;
 }
 
 export const createOrder = async (order_data: OrderData) => {
@@ -22,4 +24,9 @@ export const createOrder = async (order_data: OrderData) => {
 export const fetchUserOrders = async () => {
     const response = await httpClient.get('/api/orders');
     return response.data;
+};
+
+export const calculateShipping = async (cep: string, items: any[]) => {
+    const response = await httpClient.post('/api/shipping/calculate', { cep, items });
+    return response.data.data;
 };

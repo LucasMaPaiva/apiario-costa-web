@@ -9,8 +9,11 @@ export default function Checkout() {
     const { cart, cart_total, clearCart } = useCart();
     const navigate = useNavigate();
     const [loading, setLoading] = useState(false);
+    const [calculating_shipping, set_calculating_shipping] = useState(false);
     const [success, setSuccess] = useState(false);
     const [error, setError] = useState('');
+    const [shipping_options, set_shipping_options] = useState<any[]>([]);
+    const [selected_shipping, set_selected_shipping] = useState<any>(null);
 
     const [address, setAddress] = useState({
         cep: '',
@@ -22,13 +25,42 @@ export default function Checkout() {
         state: ''
     });
 
+    const handleCalculateShipping = async (cep: string) => {
+        if (cep.replace(/\D/g, '').length < 8) return;
+        
+        set_calculating_shipping(true);
+        setError('');
+        try {
+            const items = cart.map(item => ({ id: item.id, quantity: item.quantity }));
+            const options = await import('../../modules/orders/services/orderService').then(m => m.calculateShipping(cep, items));
+            set_shipping_options(options);
+            if (options.length > 0) {
+                set_selected_shipping(options[0]); // Seleciona o primeiro por padrão
+            }
+        } catch (err: any) {
+            setError('Não foi possível calcular o frete para este CEP.');
+            set_shipping_options([]);
+        } finally {
+            set_calculating_shipping(false);
+        }
+    };
+
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setAddress({ ...address, [e.target.name]: e.target.value });
+        const { name, value } = e.target;
+        setAddress({ ...address, [name]: value });
+        
+        if (name === 'cep' && value.replace(/\D/g, '').length === 8) {
+            handleCalculateShipping(value);
+        }
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (cart.length === 0) return;
+        if (!selected_shipping) {
+            setError('Por favor, selecione uma modalidade de frete.');
+            return;
+        }
         
         setLoading(true);
         setError('');
@@ -38,7 +70,9 @@ export default function Checkout() {
                 product_id: item.id,
                 quantity: item.quantity
             })),
-            ...address
+            ...address,
+            shipping_method: selected_shipping.name,
+            shipping_cost: selected_shipping.price
         };
 
         try {
@@ -187,6 +221,49 @@ export default function Checkout() {
                                 </div>
                             </section>
 
+                            <section className="bg-white p-8 rounded-3xl shadow-sm border border-gray-100">
+                                <div className="flex items-center gap-3 mb-8">
+                                    <div className="w-10 h-10 bg-bg-main rounded-xl flex items-center justify-center text-brand-mel">
+                                        <Truck size={20} />
+                                    </div>
+                                    <h2 className="text-xl font-black italic text-brand-dark tracking-tight">Opções de Entrega</h2>
+                                </div>
+
+                                {calculating_shipping ? (
+                                    <div className="flex flex-col items-center justify-center py-10 text-gray-400">
+                                        <Loader2 size={32} className="animate-spin mb-4" />
+                                        <p className="text-xs font-bold uppercase tracking-widest">Calculando frete...</p>
+                                    </div>
+                                ) : shipping_options.length > 0 ? (
+                                    <div className="space-y-4">
+                                        {shipping_options.map((option) => (
+                                            <div 
+                                                key={option.id}
+                                                onClick={() => set_selected_shipping(option)}
+                                                className={`flex items-center justify-between p-4 rounded-2xl border-2 transition-all cursor-pointer ${
+                                                    selected_shipping?.id === option.id 
+                                                        ? 'border-brand-mel bg-brand-mel/5' 
+                                                        : 'border-gray-50 hover:border-gray-200'
+                                                }`}
+                                            >
+                                                <div className="flex items-center gap-4">
+                                                    <img src={option.company_logo} alt={option.company} className="w-10 h-10 object-contain bg-white rounded-lg p-1 border border-gray-100" />
+                                                    <div>
+                                                        <p className="text-sm font-black text-brand-dark">{option.name}</p>
+                                                        <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">{option.delivery_time} dias úteis • {option.company}</p>
+                                                    </div>
+                                                </div>
+                                                <span className="text-sm font-black text-brand-wine">R$ {option.price.toFixed(2)}</span>
+                                            </div>
+                                        ))}
+                                    </div>
+                                ) : (
+                                    <div className="p-8 text-center bg-bg-main rounded-2xl border border-dashed border-gray-200">
+                                        <p className="text-xs text-gray-400 italic">Insira um CEP válido para ver as opções de entrega.</p>
+                                    </div>
+                                )}
+                            </section>
+
                             <section className="bg-white p-8 rounded-3xl shadow-sm border border-gray-100 opacity-60 pointer-events-none">
                                 <div className="flex items-center gap-3 mb-4">
                                     <div className="w-10 h-10 bg-bg-main rounded-xl flex items-center justify-center text-gray-400">
@@ -224,12 +301,12 @@ export default function Checkout() {
                                     </div>
                                     <div className="flex justify-between text-xs opacity-60 uppercase tracking-widest font-bold">
                                         <span>Frete</span>
-                                        <span className="italic">A calcular</span>
+                                        <span>{selected_shipping ? `R$ ${selected_shipping.price.toFixed(2)}` : 'A calcular'}</span>
                                     </div>
                                     <div className="flex justify-between items-end pt-4">
                                         <span className="text-[10px] uppercase tracking-[0.3em] font-black text-brand-mel">Total</span>
                                         <span className="text-4xl font-black italic tracking-tighter text-brand-mel">
-                                            R$ {cart_total.toFixed(2)}
+                                            R$ {(cart_total + (selected_shipping?.price || 0)).toFixed(2)}
                                         </span>
                                     </div>
                                 </div>

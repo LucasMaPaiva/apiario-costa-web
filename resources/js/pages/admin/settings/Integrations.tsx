@@ -31,10 +31,6 @@ export default function AdminIntegrations() {
 
     return (
         <div className="max-w-4xl mx-auto">
-            <div className="mb-12">
-                <h1 className="text-3xl font-bold italic text-text-primary mb-2 text-glow">Configurações de Logística</h1>
-                <p className="text-sm text-text-secondary">Gerencie suas integrações com transportadoras e meios de envio.</p>
-            </div>
 
             <div className="bg-surface rounded-[2.5rem] shadow-2xl border border-border overflow-hidden">
                 <div className="p-12">

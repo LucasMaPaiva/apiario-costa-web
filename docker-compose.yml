@@ -4,7 +4,6 @@ services:
       context: .
       dockerfile: .docker/php-fpm/Dockerfile
     container_name: apiario-costa-app
-    restart: unless-stopped
     volumes:
       - .:/var/www/html
     networks:
@@ -20,7 +19,6 @@ services:
       context: .
       dockerfile: .docker/nginx/Dockerfile
     container_name: apiario-costa-web
-    restart: unless-stopped
     ports:
       - "${APP_PORT:-8000}:80"
     volumes:
@@ -39,7 +37,6 @@ services:
       context: .
       dockerfile: .docker/pgsql/Dockerfile
     container_name: apiario-costa-db
-    restart: unless-stopped
     environment:
       POSTGRES_DB: ${DB_DATABASE:-apiario}
       POSTGRES_USER: ${DB_USERNAME:-apiario}

@@ -6,6 +6,10 @@ export interface ProductFormState {
     stock: string;
     category_id: string;
     is_active: boolean;
+    weight: string;
+    width: string;
+    height: string;
+    length: string;
     remove_main_image?: boolean;
 }
 

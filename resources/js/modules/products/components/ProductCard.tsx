@@ -1,41 +1,61 @@
-import React from 'react';
-import { ShoppingCart } from 'lucide-react';
+import { ShoppingCart, ShoppingBag } from 'lucide-react';
 import { Product } from '../services/productService';
+import { Link } from 'react-router-dom';
+import { useCart } from '../../cart/context/CartContext';
 
 interface ProductCardProps {
     product: Product;
 }
 
 const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
+    const { addToCart } = useCart();
+
     return (
-        <div className="bg-brand-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-shadow group">
-            <div className="aspect-square bg-gray-50 flex items-center justify-center p-8">
-                {product.image_path ? (
-                    <img src={product.image_path} alt={product.name} className="max-h-full object-contain" />
-                ) : (
-                    <div className="w-full h-full flex items-center justify-center bg-brand-light/20 rounded-xl">
-                        <span className="text-brand-dark/20 font-bold italic tracking-tighter text-2xl">Apiário Costa</span>
-                    </div>
-                )}
-            </div>
+        <div className="bg-surface rounded-2xl shadow-sm border border-border overflow-hidden hover:shadow-md transition-shadow group">
+            <Link to={`/produto/${product.slug}`} className="block relative">
+                <div className="aspect-square bg-bg-main flex items-center justify-center p-8 overflow-hidden">
+                    {product.image_path ? (
+                        <img 
+                            src={product.image_path} 
+                            alt={product.name} 
+                            className="w-full h-full object-contain p-4 transition-transform duration-500 group-hover:scale-110" 
+                        />
+                    ) : (
+                        <div className="w-full h-full flex flex-col items-center justify-center bg-brand-mel/5 rounded-xl border border-brand-mel/10 p-8">
+                            <ShoppingBag size={48} className="text-brand-mel/20 mb-2" />
+                            <span className="text-brand-mel/30 font-black italic tracking-tighter text-sm uppercase">Apiário Costa</span>
+                        </div>
+                    )}
+                </div>
+                <div className="absolute inset-0 bg-brand-wine/10 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                    <span className="bg-surface text-brand-wine text-[9px] font-black uppercase tracking-widest px-4 py-2 rounded-full shadow-lg transform translate-y-4 group-hover:translate-y-0 transition-transform">
+                        Ver Detalhes
+                    </span>
+                </div>
+            </Link>
             <div className="p-6">
                 <div className="flex justify-between items-start mb-2">
                     <span className="text-[10px] uppercase tracking-widest text-brand-mel font-black">
                         {product.category?.name || 'Geral'}
                     </span>
-                    <span className="text-brand-dark font-bold">
-                        R$ {Number(product.price).toFixed(2)}
+                    <span className="text-text-primary font-bold">
+                        R$ {Number(product.price).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                     </span>
                 </div>
-                <h3 className="text-xl font-bold italic text-brand-dark mb-3 group-hover:text-brand-wine transition-colors">
-                    {product.name}
-                </h3>
-                <p className="text-gray-400 text-xs leading-relaxed mb-6 line-clamp-2">
+                <Link to={`/produto/${product.slug}`}>
+                    <h3 className="text-xl font-bold italic text-text-primary mb-3 group-hover:text-brand-wine transition-colors">
+                        {product.name}
+                    </h3>
+                </Link>
+                <p className="text-text-secondary text-xs leading-relaxed mb-6 line-clamp-2">
                     {product.description}
                 </p>
-                <button className="w-full py-4 border border-brand-wine text-brand-wine text-[10px] uppercase tracking-[0.2em] font-black flex items-center justify-center gap-2 hover:bg-brand-wine hover:text-white transition-all">
-                    <ShoppingCart size={14} />
-                    Tenho Interesse
+                <button 
+                    onClick={() => addToCart(product, 1)}
+                    className="w-full py-4 bg-bg-main border border-brand-mel/20 text-text-primary text-[11px] uppercase tracking-[0.25em] font-black rounded-xl flex items-center justify-center gap-3 hover:bg-brand-mel hover:text-white transition-all shadow-sm group/btn"
+                >
+                    <ShoppingBag size={20} className="transition-transform group-hover/btn:scale-110" />
+                    Adicionar ao Carrinho
                 </button>
             </div>
         </div>

@@ -4,13 +4,18 @@ import MainLayout from '../../layouts/MainLayout';
 import AdminLayout from '../../layouts/AdminLayout';
 import HomePage from '../../pages/home';
 import LoginPage from '../../pages/auth/login';
+import RegisterPage from '../../pages/auth/register';
 import StorePage from '../../pages/store';
+import ProductDetails from '../../pages/store/ProductDetails';
+import Checkout from '../../pages/store/Checkout';
 
 // Admin Pages
 import AdminProductsList from '../../pages/admin/index';
 import AdminProductCreate from '../../pages/admin/products/create';
 import AdminProductEdit from '../../pages/admin/products/edit';
 import AdminCategoriesList from '../../pages/admin/categories/index';
+import AdminOrdersList from '../../pages/admin/orders/index';
+import AdminIntegrations from '../../pages/admin/settings/Integrations';
 
 const router = createBrowserRouter([
     {
@@ -30,8 +35,32 @@ const router = createBrowserRouter([
         ),
     },
     {
+        path: '/produto/:slug',
+        element: (
+            <MainLayout>
+                <ProductDetails />
+            </MainLayout>
+        ),
+    },
+    {
+        path: '/checkout',
+        element: (
+            <MainLayout>
+                <Checkout />
+            </MainLayout>
+        ),
+    },
+    {
         path: '/laravel-admin',
         element: <LoginPage />,
+    },
+    {
+        path: '/login',
+        element: <LoginPage />,
+    },
+    {
+        path: '/cadastro',
+        element: <RegisterPage />,
     },
     {
         path: '/admin',
@@ -52,6 +81,14 @@ const router = createBrowserRouter([
             {
                 path: 'categorias',
                 element: <AdminCategoriesList />
+            },
+            {
+                path: 'pedidos',
+                element: <AdminOrdersList />
+            },
+            {
+                path: 'logistica',
+                element: <AdminIntegrations />
             }
         ]
     },

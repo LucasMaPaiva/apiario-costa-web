@@ -70,6 +70,7 @@ Fluxo esperado da IA:
 - `ai/agents/frontend-form-agent.md`
 - `ai/agents/frontend-review-agent.md`
 - `ai/docs/frontend/index.md`
+- `ai/docs/checklist_validacao.md`
 
 ## Exemplos de Prompt
 

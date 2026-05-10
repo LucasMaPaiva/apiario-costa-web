@@ -18,6 +18,10 @@ export interface Product {
         name: string;
         slug: string;
     };
+    images?: Array<{
+        id: number;
+        image_path: string;
+    }>;
 }
 
 export const fetchProducts = async (): Promise<Product[]> => {

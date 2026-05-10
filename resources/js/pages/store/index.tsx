@@ -6,20 +6,20 @@ import { LayoutGrid, Loader2, Filter, ChevronRight } from 'lucide-react';
 export default function StorePage() {
     const [products, setProducts] = useState<Product[]>([]);
     const [categories, setCategories] = useState<Category[]>([]);
-    const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
-    const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+    const [filtered_products, set_filtered_products] = useState<Product[]>([]);
+    const [selected_category, set_selected_category] = useState<string | null>(null);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const loadInitialData = async () => {
             try {
-                const [productsData, categoriesData] = await Promise.all([
+                const [products_data, categories_data] = await Promise.all([
                     fetchProducts(),
                     fetchCategories()
                 ]);
-                setProducts(productsData);
-                setFilteredProducts(productsData);
-                setCategories(categoriesData);
+                setProducts(products_data);
+                set_filtered_products(products_data);
+                setCategories(categories_data);
             } catch (error) {
                 console.error('Failed to load store data:', error);
             } finally {
@@ -30,15 +30,15 @@ export default function StorePage() {
     }, []);
 
     useEffect(() => {
-        if (selectedCategory) {
-            setFilteredProducts(products.filter(p => p.category?.slug === selectedCategory));
+        if (selected_category) {
+            set_filtered_products(products.filter(p => p.category?.slug === selected_category));
         } else {
-            setFilteredProducts(products);
+            set_filtered_products(products);
         }
-    }, [selectedCategory, products]);
+    }, [selected_category, products]);
 
     return (
-        <div className="min-h-screen bg-brand-bg pt-32 pb-20">
+        <div className="min-h-screen bg-bg-main pt-32 pb-20">
             <div className="container mx-auto px-4">
                 {/* Header */}
                 <div className="flex flex-col md:flex-row justify-between items-end mb-16 gap-6">
@@ -57,7 +57,7 @@ export default function StorePage() {
                         </div>
                         <div className="px-4 pr-8">
                             <span className="block text-[10px] uppercase tracking-widest text-gray-400 font-bold">Exibindo</span>
-                            <span className="block text-brand-dark font-black tracking-tighter">{filteredProducts.length} Produtos</span>
+                            <span className="block text-brand-dark font-black tracking-tighter">{filtered_products.length} Produtos</span>
                         </div>
                     </div>
                 </div>
@@ -73,33 +73,33 @@ export default function StorePage() {
 
                             <div className="space-y-2">
                                 <button
-                                    onClick={() => setSelectedCategory(null)}
+                                    onClick={() => set_selected_category(null)}
                                     className={`w-full flex items-center justify-between p-4 rounded-xl transition-all ${
-                                        selectedCategory === null 
+                                        selected_category === null 
                                         ? 'bg-brand-white shadow-md border-l-4 border-brand-mel' 
                                         : 'hover:bg-brand-white/50 text-gray-400'
                                     }`}
                                 >
-                                    <span className={`text-xs font-bold ${selectedCategory === null ? 'text-brand-dark' : ''}`}>
+                                    <span className={`text-xs font-bold ${selected_category === null ? 'text-brand-dark' : ''}`}>
                                         Todos os Produtos
                                     </span>
-                                    {selectedCategory === null && <ChevronRight size={14} className="text-brand-mel" />}
+                                    {selected_category === null && <ChevronRight size={14} className="text-brand-mel" />}
                                 </button>
 
                                 {categories.map((category) => (
                                     <button
                                         key={category.id}
-                                        onClick={() => setSelectedCategory(category.slug)}
+                                        onClick={() => set_selected_category(category.slug)}
                                         className={`w-full flex items-center justify-between p-4 rounded-xl transition-all ${
-                                            selectedCategory === category.slug 
+                                            selected_category === category.slug 
                                             ? 'bg-brand-white shadow-md border-l-4 border-brand-mel' 
                                             : 'hover:bg-brand-white/50 text-gray-400'
                                         }`}
                                     >
-                                        <span className={`text-xs font-bold ${selectedCategory === category.slug ? 'text-brand-dark' : ''}`}>
+                                        <span className={`text-xs font-bold ${selected_category === category.slug ? 'text-brand-dark' : ''}`}>
                                             {category.name}
                                         </span>
-                                        {selectedCategory === category.slug && <ChevronRight size={14} className="text-brand-mel" />}
+                                        {selected_category === category.slug && <ChevronRight size={14} className="text-brand-mel" />}
                                     </button>
                                 ))}
                             </div>
@@ -120,9 +120,9 @@ export default function StorePage() {
                                 <Loader2 className="animate-spin text-brand-mel" size={40} />
                                 <span className="text-[10px] uppercase tracking-widest text-gray-400 font-black">Carregando catálogo...</span>
                             </div>
-                        ) : filteredProducts.length > 0 ? (
+                        ) : filtered_products.length > 0 ? (
                             <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-8">
-                                {filteredProducts.map((product) => (
+                                {filtered_products.map((product) => (
                                     <ProductCard key={product.id} product={product} />
                                 ))}
                             </div>

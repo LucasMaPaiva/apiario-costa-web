@@ -16,3 +16,8 @@ export const logoutService = async () => {
     const response = await httpClient.post('/auth/logout');
     return response.data;
 };
+
+export const registerService = async (data: any) => {
+    const response = await httpClient.post('/auth/register', data);
+    return response.data;
+};

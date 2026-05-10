@@ -35,4 +35,11 @@ return [
         ],
     ],
 
+    'melhor_envio' => [
+        'client_id' => env('MELHORENVIO_CLIENT_ID'),
+        'client_secret' => env('MELHORENVIO_CLIENT_SECRET'),
+        'redirect_uri' => env('MELHORENVIO_REDIRECT_URI'),
+        'environment' => env('MELHORENVIO_ENVIRONMENT', 'sandbox'),
+    ],
+
 ];

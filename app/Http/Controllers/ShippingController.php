@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Services\Logistics\MelhorEnvioService;
 use App\Services\Logistics\ShippingRuleResolver;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class ShippingController extends Controller
 {
@@ -26,8 +27,11 @@ class ShippingController extends Controller
             'items.*.quantity' => 'required|integer|min:1',
         ]);
 
+        Log::info('Shipping: cálculo solicitado.', ['cep' => $request->cep, 'items' => count($request->items)]);
+
         $rule = $this->ruleResolver->resolve($request->cep);
         if ($rule) {
+            Log::info('Shipping: regra local aplicada.', ['rule_id' => $rule->id, 'name' => $rule->name, 'price' => $rule->flat_price]);
             return response()->json(['data' => [[
                 'id' => 'local-' . $rule->id,
                 'name' => $rule->name,
@@ -53,8 +57,11 @@ class ShippingController extends Controller
         })->filter()->toArray();
 
         if (empty($items)) {
+            Log::warning('Shipping: nenhum produto válido no carrinho.');
             return response()->json(['message' => 'Nenhum produto válido para cálculo.'], 400);
         }
+
+        Log::info('Shipping: sem regra local — caindo para Melhor Envio.');
 
         try {
             $quotes = $this->melhorEnvio->calculate($request->cep, $items);
@@ -68,8 +75,10 @@ class ShippingController extends Controller
                 'company_logo' => $q['company']['picture'],
             ])->values();
 
+            Log::info('Shipping: opções de frete retornadas.', ['count' => $options->count()]);
             return response()->json(['data' => $options]);
         } catch (\Exception $e) {
+            Log::error('Shipping: falha no cálculo via Melhor Envio.', ['message' => $e->getMessage()]);
             return response()->json(['message' => $e->getMessage()], 500);
         }
     }

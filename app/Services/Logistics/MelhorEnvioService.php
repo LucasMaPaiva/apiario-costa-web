@@ -97,16 +97,23 @@ class MelhorEnvioService
      */
     protected function getAccessToken(): string
     {
-        $integration = Integration::where('provider', 'melhor-envio')->firstOrFail();
+        $integration = Integration::where('provider', 'melhor-envio')->first();
+
+        if (!$integration) {
+            Log::warning('Melhor Envio: integração não configurada — fluxo OAuth não foi concluído.');
+            throw new \Exception('Integração com Melhor Envio não configurada. Conecte em /admin/configuracoes.');
+        }
 
         if ($integration->expires_at->isPast()) {
+            Log::info('Melhor Envio: token expirado, renovando.', ['expires_at' => $integration->expires_at->toDateTimeString()]);
             $tokens = $this->refreshToken($integration->refresh_token);
-            
+
             $integration->update([
                 'access_token' => $tokens['access_token'],
                 'refresh_token' => $tokens['refresh_token'],
                 'expires_at' => Carbon::now()->addSeconds($tokens['expires_in']),
             ]);
+            Log::info('Melhor Envio: token renovado com sucesso.');
         }
 
         return $integration->access_token;
@@ -117,6 +124,8 @@ class MelhorEnvioService
      */
     public function calculate(string $toZipCode, array $products): array
     {
+        Log::info('Melhor Envio: iniciando cálculo de frete.', ['to' => $toZipCode, 'items' => count($products)]);
+
         $storeAddress = \App\Models\Setting::getValue('store_address');
         $fromZipCode = null;
 
@@ -126,25 +135,35 @@ class MelhorEnvioService
         }
 
         if (!$fromZipCode) {
+            Log::warning('Melhor Envio: CEP de origem não configurado.');
             throw new \Exception('CEP de origem não configurado nas configurações da loja.');
         }
 
         $token = $this->getAccessToken();
 
+        $payload = [
+            'from' => ['postal_code' => $fromZipCode],
+            'to' => ['postal_code' => $toZipCode],
+            'products' => $this->mapProducts($products),
+        ];
+        Log::debug('Melhor Envio: payload do cálculo.', $payload);
+
         $response = Http::withToken($token)
+            ->acceptJson()
             ->withHeaders(['User-Agent' => config('app.name') . ' (contato@dominio.com)'])
-            ->post("{$this->baseUrl}/api/v2/me/shipment/calculate", [
-                'from' => ['postal_code' => $fromZipCode],
-                'to' => ['postal_code' => $toZipCode],
-                'products' => $this->mapProducts($products),
-            ]);
+            ->post("{$this->baseUrl}/api/v2/me/shipment/calculate", $payload);
 
         if ($response->failed()) {
-            Log::error('Melhor Envio Calculate Error: ' . $response->body());
+            Log::error('Melhor Envio: erro no cálculo de frete.', [
+                'status' => $response->status(),
+                'body' => $response->body(),
+            ]);
             return [];
         }
 
-        return $response->json();
+        $quotes = $response->json();
+        Log::info('Melhor Envio: cotações recebidas.', ['count' => is_array($quotes) ? count($quotes) : 0]);
+        return $quotes ?? [];
     }
 
     /**

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Integration;
 use App\Services\Logistics\MelhorEnvioService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Carbon\Carbon;
 
 class IntegrationController extends Controller
@@ -63,12 +64,20 @@ class IntegrationController extends Controller
      */
     public function callback(Request $request)
     {
+        Log::info('Melhor Envio callback recebido.', ['has_code' => $request->has('code'), 'has_error' => $request->has('error')]);
+
+        if ($request->has('error')) {
+            Log::warning('Melhor Envio: callback retornou erro.', $request->only(['error', 'error_description']));
+            return redirect('/admin/configuracoes?tab=logistics&error=' . urlencode($request->input('error_description', $request->input('error'))));
+        }
+
         if (!$request->has('code')) {
             return response()->json(['message' => 'Código de autorização não fornecido.'], 400);
         }
 
         try {
             $tokens = $this->melhorEnvio->getTokenFromCode($request->code);
+            Log::info('Melhor Envio: tokens obtidos com sucesso.', ['expires_in' => $tokens['expires_in'] ?? null]);
 
             Integration::updateOrCreate(
                 ['provider' => 'melhor-envio'],
@@ -77,13 +86,14 @@ class IntegrationController extends Controller
                     'refresh_token' => $tokens['refresh_token'],
                     'expires_at' => Carbon::now()->addSeconds($tokens['expires_in']),
                     'environment' => config('services.melhor_envio.environment'),
-                    'data' => [] // Pode salvar dados do usuário aqui futuramente
+                    'data' => []
                 ]
             );
 
             return redirect('/admin/configuracoes?tab=logistics&success=true');
 
         } catch (\Exception $e) {
+            Log::error('Melhor Envio: falha ao concluir callback.', ['message' => $e->getMessage()]);
             return redirect('/admin/configuracoes?tab=logistics&error=' . urlencode($e->getMessage()));
         }
     }

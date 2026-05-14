@@ -46,7 +46,7 @@ export default function LoginForm() {
         >
             <div className="text-center mb-10">
                 <img src="/logo.jpg" alt="Logo" className="h-20 mx-auto mb-6 grayscale hover:grayscale-0 transition-all duration-500" />
-                <h2 className="text-2xl font-bold italic text-brand-dark">Acesso Administrativo</h2>
+                <h2 className="text-2xl font-bold italic text-brand-dark">Entre na sua conta</h2>
                 <p className="text-xs text-gray-400 uppercase tracking-widest mt-2">Apiário Costa</p>
             </div>
 

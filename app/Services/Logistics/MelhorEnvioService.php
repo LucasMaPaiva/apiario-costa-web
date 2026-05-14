@@ -9,7 +9,8 @@ use Carbon\Carbon;
 
 class MelhorEnvioService
 {
-    protected string $baseUrl;
+    protected string $apiUrl;
+    protected string $webUrl;
     protected string $clientId;
     protected string $clientSecret;
     protected string $redirectUri;
@@ -19,11 +20,15 @@ class MelhorEnvioService
         $this->clientId = config('services.melhor_envio.client_id');
         $this->clientSecret = config('services.melhor_envio.client_secret');
         $this->redirectUri = config('services.melhor_envio.redirect_uri');
-        
+
         $environment = config('services.melhor_envio.environment', 'sandbox');
-        $this->baseUrl = $environment === 'production'
-            ? 'https://app.melhorenvio.com.br'
-            : 'https://app-sandbox.melhorenvio.com.br';
+        if ($environment === 'production') {
+            $this->apiUrl = 'https://melhorenvio.com.br';
+            $this->webUrl = 'https://app.melhorenvio.com.br';
+        } else {
+            $this->apiUrl = 'https://sandbox.melhorenvio.com.br';
+            $this->webUrl = 'https://app-sandbox.melhorenvio.com.br';
+        }
     }
 
     /**
@@ -33,7 +38,7 @@ class MelhorEnvioService
     {
         $scopes = 'shipping-calculate cart-read cart-write shipping-checkout shipping-generate shipping-print shipping-tracking shipping-cancel shipping-companies users-read';
         
-        return "{$this->baseUrl}/oauth/authorize?" . http_build_query([
+        return "{$this->webUrl}/oauth/authorize?" . http_build_query([
             'client_id' => $this->clientId,
             'redirect_uri' => $this->redirectUri,
             'response_type' => 'code',
@@ -46,7 +51,7 @@ class MelhorEnvioService
      */
     public function getTokenFromCode(string $code): array
     {
-        $response = Http::acceptJson()->asForm()->post("{$this->baseUrl}/oauth/token", [
+        $response = Http::acceptJson()->asForm()->post("{$this->apiUrl}/oauth/token", [
             'grant_type' => 'authorization_code',
             'client_id' => $this->clientId,
             'client_secret' => $this->clientSecret,
@@ -72,7 +77,7 @@ class MelhorEnvioService
      */
     public function refreshToken(string $refreshToken): array
     {
-        $response = Http::acceptJson()->asForm()->post("{$this->baseUrl}/oauth/token", [
+        $response = Http::acceptJson()->asForm()->post("{$this->apiUrl}/oauth/token", [
             'grant_type' => 'refresh_token',
             'client_id' => $this->clientId,
             'client_secret' => $this->clientSecret,
@@ -151,7 +156,7 @@ class MelhorEnvioService
         $response = Http::withToken($token)
             ->acceptJson()
             ->withHeaders(['User-Agent' => config('app.name') . ' (contato@dominio.com)'])
-            ->post("{$this->baseUrl}/api/v2/me/shipment/calculate", $payload);
+            ->post("{$this->apiUrl}/api/v2/me/shipment/calculate", $payload);
 
         if ($response->failed()) {
             Log::error('Melhor Envio: erro no cálculo de frete.', [
@@ -191,7 +196,7 @@ class MelhorEnvioService
     {
         $response = Http::withToken($token)
             ->withHeaders(['User-Agent' => config('app.name') . ' (contato@dominio.com)'])
-            ->get("{$this->baseUrl}/api/v2/me");
+            ->get("{$this->apiUrl}/api/v2/me");
 
         return $response->json();
     }

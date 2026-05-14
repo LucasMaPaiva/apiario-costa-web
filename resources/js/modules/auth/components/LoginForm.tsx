@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { motion } from 'motion/react';
+import { Link } from 'react-router-dom';
 import { loginService } from '../services/authService';
 
 export default function LoginForm() {
@@ -63,7 +64,7 @@ export default function LoginForm() {
                 </div>
 
                 <div>
-                    <label className="block text-[10px] uppercase font-bold text-brand-wine tracking-widest mb-2">Cadastro</label>
+                    <label className="block text-[10px] uppercase font-bold text-brand-wine tracking-widest mb-2">Senha</label>
                     <input
                         type="password"
                         value={password}
@@ -92,6 +93,13 @@ export default function LoginForm() {
                     {loading ? 'AUTENTICANDO...' : 'ENTRAR NO SISTEMA'}
                 </button>
             </form>
+
+            <p className="text-center text-xs text-gray-500 mt-8">
+                Não tem uma conta?{' '}
+                <Link to="/cadastro" className="font-bold text-brand-wine hover:text-brand-mel transition-colors">
+                    Cadastre-se
+                </Link>
+            </p>
         </motion.div>
     );
 }

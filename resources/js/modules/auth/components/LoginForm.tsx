@@ -20,7 +20,15 @@ export default function LoginForm() {
             console.log('Login successful, response:', response);
             
             localStorage.setItem('auth_token', response.data.access_token);
-            window.location.assign('/admin'); 
+            
+            // Check if user is admin based on the login response
+            const isAdmin = response.data.user.roles?.some((r: any) => r.name === 'admin') || false;
+            
+            if (isAdmin) {
+                window.location.assign('/admin');
+            } else {
+                window.location.assign('/loja');
+            }
         } catch (err: any) {
             console.error('Submission error:', err);
             setError(err.response?.data?.message || 'Erro de conexão ou servidor.');
@@ -48,7 +56,7 @@ export default function LoginForm() {
                         type="email"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
-                        className="w-full px-4 py-3 bg-brand-bg border border-gray-100 rounded-[4px] focus:outline-none focus:border-brand-mel transition-colors font-medium text-sm"
+                        className="w-full px-4 py-3 bg-bg-main border border-gray-100 rounded-[4px] focus:outline-none focus:border-brand-mel transition-colors font-medium text-sm"
                         placeholder="seu@email.com"
                         required
                     />
@@ -60,7 +68,7 @@ export default function LoginForm() {
                         type="password"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
-                        className="w-full px-4 py-3 bg-brand-bg border border-gray-100 rounded-[4px] focus:outline-none focus:border-brand-mel transition-colors font-medium text-sm"
+                        className="w-full px-4 py-3 bg-bg-main border border-gray-100 rounded-[4px] focus:outline-none focus:border-brand-mel transition-colors font-medium text-sm"
                         placeholder="••••••••"
                         required
                     />

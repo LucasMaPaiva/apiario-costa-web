@@ -23,6 +23,7 @@ class LoginService
         }
 
         $user = Auth::user();
+        $user->load('roles');
         $token = $user->createToken('auth-token')->plainTextToken;
 
         return [

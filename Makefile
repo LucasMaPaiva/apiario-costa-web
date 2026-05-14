@@ -48,3 +48,9 @@ npm-dev:
 
 npm-build:
 	docker compose exec app npm run build
+
+ngrok-url:
+	@curl -s http://localhost:4040/api/tunnels | grep -o 'https://[^"]*' | head -n 1
+
+ngrok:
+	ngrok http 8000

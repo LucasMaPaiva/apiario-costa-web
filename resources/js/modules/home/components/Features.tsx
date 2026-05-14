@@ -26,7 +26,7 @@ export default function Features() {
   ];
 
   return (
-    <section id="diferenciais" className="py-24 bg-brand-white border-t border-gray-100">
+    <section id="diferenciais" className="py-24 bg-surface border-t border-border transition-colors duration-500">
       <div className="max-w-7xl mx-auto px-4 sm:px-12">
         <div className="grid lg:grid-cols-2 gap-16 items-center">
           <motion.div
@@ -40,7 +40,6 @@ export default function Features() {
                 src="/honey-5.jpg"
                 alt="Mel puro e artesanal Apiário Costa"
                 className="rounded-2xl shadow-2xl relative z-10"
-                referrerPolicy="no-referrer"
               />
               <div className="absolute top-0 right-0 w-60 h-60 opacity-5 honeycomb-pattern pointer-events-none -mr-32 -mt-10"></div>
             </div>
@@ -53,18 +52,18 @@ export default function Features() {
             className="order-1 lg:order-2"
           >
             <span className="text-brand-wine uppercase tracking-[0.3em] text-xs font-bold mb-4 block">Diferenciais Costa</span>
-            <h2 className="text-4xl md:text-5xl font-bold italic mb-10 leading-tight">
+            <h2 className="text-4xl md:text-5xl font-bold italic mb-10 leading-tight text-text-primary">
               O que nos torna uma escolha especial para você.
             </h2>
             
             <div className="grid sm:grid-cols-2 gap-x-8 gap-y-12">
               {features.map((feature, index) => (
-                <div key={index} className="flex flex-col items-start bg-brand-bg p-6 rounded-[4px] border border-gray-100 shadow-sm hover:shadow-md transition-all">
+                <div key={index} className="flex flex-col items-start bg-bg-main p-6 rounded-2xl border border-border shadow-sm hover:shadow-xl hover:border-brand-mel/30 transition-all">
                   <div className="mb-4 text-brand-wine">
                     {feature.icon}
                   </div>
                   <h3 className="text-[10px] uppercase font-bold text-brand-wine tracking-widest mb-2">{feature.title}</h3>
-                  <p className="text-xs text-gray-500 italic leading-relaxed font-medium">{feature.desc}</p>
+                  <p className="text-xs text-text-secondary italic leading-relaxed font-medium">{feature.desc}</p>
                 </div>
               ))}
             </div>

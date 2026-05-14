@@ -4,26 +4,26 @@ import { useAdminCategories } from '../../../modules/admin/hooks/useAdminCategor
 
 export default function AdminCategoriesList() {
     const { categories, loading, handleCreateCategory, handleDeleteCategory } = useAdminCategories();
-    const [isSubmitting, setIsSubmitting] = useState(false);
-    const [newCategoryName, setNewCategoryName] = useState('');
-    const [newCategorySlug, setNewCategorySlug] = useState('');
+    const [is_submitting, set_is_submitting] = useState(false);
+    const [new_category_name, set_new_category_name] = useState('');
+    const [new_category_slug, set_new_category_slug] = useState('');
 
     const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const name = e.target.value;
         const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
-        setNewCategoryName(name);
-        setNewCategorySlug(slug);
+        set_new_category_name(name);
+        set_new_category_slug(slug);
     };
 
     const handleCreate = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!newCategoryName || !newCategorySlug) return;
+        if (!new_category_name || !new_category_slug) return;
         
-        setIsSubmitting(true);
+        set_is_submitting(true);
         try {
-            await handleCreateCategory(newCategoryName, newCategorySlug);
-            setNewCategoryName('');
-            setNewCategorySlug('');
+            await handleCreateCategory(new_category_name, new_category_slug);
+            set_new_category_name('');
+            set_new_category_slug('');
         } catch (error: any) {
             let errorMessage = 'Erro ao criar categoria.';
             if (error.response?.data?.errors) {
@@ -35,7 +35,7 @@ export default function AdminCategoriesList() {
             }
             alert(errorMessage);
         } finally {
-            setIsSubmitting(false);
+            set_is_submitting(false);
         }
     };
 
@@ -79,7 +79,7 @@ export default function AdminCategoriesList() {
                                 <input
                                     type="text"
                                     required
-                                    value={newCategoryName}
+                                    value={new_category_name}
                                     onChange={handleNameChange}
                                     className="w-full px-6 py-5 bg-bg-main border border-border rounded-2xl focus:outline-none focus:border-brand-mel focus:ring-8 focus:ring-brand-mel/5 transition-all font-bold text-sm text-text-primary"
                                     placeholder="Ex: Mel Silvestre"
@@ -90,8 +90,8 @@ export default function AdminCategoriesList() {
                                 <input
                                     type="text"
                                     required
-                                    value={newCategorySlug}
-                                    onChange={(e) => setNewCategorySlug(e.target.value)}
+                                    value={new_category_slug}
+                                    onChange={(e) => set_new_category_slug(e.target.value)}
                                     className="w-full px-6 py-5 bg-bg-main/50 border border-border rounded-2xl focus:outline-none focus:border-brand-mel transition-all font-bold text-sm text-text-secondary italic"
                                 />
                             </div>
@@ -99,10 +99,10 @@ export default function AdminCategoriesList() {
 
                         <button
                             type="submit"
-                            disabled={isSubmitting}
+                            disabled={is_submitting}
                             className="w-full flex justify-center items-center gap-4 bg-brand-mel text-white px-8 py-5 rounded-2xl text-xs uppercase tracking-[0.2em] font-black hover:bg-brand-gold transition-all shadow-2xl shadow-brand-mel/30 disabled:opacity-50 active:scale-95 group"
                         >
-                            {isSubmitting ? (
+                            {is_submitting ? (
                                 <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                             ) : (
                                 <><Plus size={20} className="group-hover:rotate-90 transition-transform duration-500" /> Criar Categoria</>

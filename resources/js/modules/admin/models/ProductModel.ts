@@ -19,6 +19,10 @@ export interface Product {
     categoryId: number;
     category?: Category;
     images?: ProductImage[];
+    weight: number;
+    width: number;
+    height: number;
+    length: number;
     createdAt: string;
     updatedAt: string;
 }
@@ -41,6 +45,10 @@ export const adaptProduct = (data: any): Product => {
             isMain: img.is_main,
             order: img.order
         })),
+        weight: Number(data.weight),
+        width: Number(data.width),
+        height: Number(data.height),
+        length: Number(data.length),
         createdAt: data.created_at,
         updatedAt: data.updated_at,
     };

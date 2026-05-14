@@ -46,7 +46,7 @@ class MelhorEnvioService
      */
     public function getTokenFromCode(string $code): array
     {
-        $response = Http::asForm()->post("{$this->baseUrl}/oauth/token", [
+        $response = Http::acceptJson()->asForm()->post("{$this->baseUrl}/oauth/token", [
             'grant_type' => 'authorization_code',
             'client_id' => $this->clientId,
             'client_secret' => $this->clientSecret,
@@ -54,12 +54,17 @@ class MelhorEnvioService
             'code' => $code,
         ]);
 
-        if ($response->failed()) {
-            Log::error('Melhor Envio OAuth Error: ' . $response->body());
-            throw new \Exception('Falha ao obter token do Melhor Envio.');
+        $data = $response->json();
+
+        if ($response->failed() || !is_array($data) || empty($data['access_token'])) {
+            Log::error('Melhor Envio OAuth Error', [
+                'status' => $response->status(),
+                'body' => $response->body(),
+            ]);
+            throw new \Exception('Falha ao obter token do Melhor Envio: ' . $response->body());
         }
 
-        return $response->json();
+        return $data;
     }
 
     /**
@@ -67,19 +72,24 @@ class MelhorEnvioService
      */
     public function refreshToken(string $refreshToken): array
     {
-        $response = Http::asForm()->post("{$this->baseUrl}/oauth/token", [
+        $response = Http::acceptJson()->asForm()->post("{$this->baseUrl}/oauth/token", [
             'grant_type' => 'refresh_token',
             'client_id' => $this->clientId,
             'client_secret' => $this->clientSecret,
             'refresh_token' => $refreshToken,
         ]);
 
-        if ($response->failed()) {
-            Log::error('Melhor Envio Refresh Token Error: ' . $response->body());
+        $data = $response->json();
+
+        if ($response->failed() || !is_array($data) || empty($data['access_token'])) {
+            Log::error('Melhor Envio Refresh Token Error', [
+                'status' => $response->status(),
+                'body' => $response->body(),
+            ]);
             throw new \Exception('Falha ao renovar token do Melhor Envio.');
         }
 
-        return $response->json();
+        return $data;
     }
 
     /**

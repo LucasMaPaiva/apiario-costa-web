@@ -1,16 +1,27 @@
+ifneq (,$(wildcard .env))
+    include .env
+    export
+endif
+
 install: build setup-networks up
 	docker compose exec app composer install
-	docker compose exec app npm install
 	docker compose exec app php artisan key:generate --ansi
 	docker compose exec app php artisan migrate --ansi
-	docker compose exec app npm run build
+	@if [ ! -f public/build/manifest.json ]; then \
+		echo ">> Building frontend assets (first time)..."; \
+		docker compose exec app npm install; \
+		docker compose exec app npm run build; \
+	else \
+		echo ">> Frontend assets already built, skipping npm install/build."; \
+	fi
 	$(MAKE) fix-permissions
 
 fix-permissions:
 	docker compose exec app chmod -R 777 storage bootstrap/cache
 
 setup-networks:
-	docker network inspect nginx-proxy-manager >/dev/null 2>&1 || docker network create nginx-proxy-manager
+	@NET=$${NPM_NETWORK:-nginx-proxy-manager}; \
+	docker network inspect $$NET >/dev/null 2>&1 || docker network create $$NET
 
 build:
 	docker compose build

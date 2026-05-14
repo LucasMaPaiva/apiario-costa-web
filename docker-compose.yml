@@ -54,7 +54,7 @@ networks:
   apiario-network:
     driver: bridge
   npm-network:
-    name: nginx-proxy-manager
+    name: ${NPM_NETWORK:-nginx-proxy-manager}
     external: true
 
 volumes:

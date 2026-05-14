@@ -17,6 +17,10 @@
 /public/build
 /public/hot
 /public/storage
+/public/products/*
+!/public/products/[0-2][0-9].jpg
+!/public/products/[0-2][0-9].png
+!/public/products/[0-2][0-9].1.png
 /storage/*.key
 /storage/pail
 /vendor

@@ -5,7 +5,7 @@ namespace App\Services\Product;
 use App\Models\Product;
 use App\Repositories\ProductRepository;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class UpdateProductService
 {
@@ -19,12 +19,8 @@ class UpdateProductService
             $product = $this->repository->find($id);
 
             if ($main_image) {
-                if ($product->image_path) {
-                    $old_path = str_replace('/storage/', '', $product->image_path);
-                    Storage::disk('public')->delete($old_path);
-                }
-                $path = $main_image->store('products', 'public');
-                $data['image_path'] = '/storage/' . $path;
+                $this->deleteImage($product->image_path);
+                $data['image_path'] = $this->storeImage($main_image);
             }
 
             $this->repository->update($product, $data);
@@ -33,8 +29,7 @@ class UpdateProductService
                 foreach ($removed_images as $image_id) {
                     $image = $this->repository->findImage($image_id);
                     if ($image->product_id === $product->id) {
-                        $old_path = str_replace('/storage/', '', $image->path);
-                        Storage::disk('public')->delete($old_path);
+                        $this->deleteImage($image->path);
                         $this->repository->deleteImage($image);
                     }
                 }
@@ -43,10 +38,9 @@ class UpdateProductService
             if (!empty($carousel_images)) {
                 $max_order = $product->images()->max('order') ?? 0;
                 foreach ($carousel_images as $index => $image) {
-                    $path = $image->store('products', 'public');
                     $this->repository->createImage([
                         'product_id' => $product->id,
-                        'path' => '/storage/' . $path,
+                        'path' => $this->storeImage($image),
                         'is_main' => false,
                         'order' => $max_order + $index + 1
                     ]);
@@ -55,5 +49,20 @@ class UpdateProductService
 
             return $product->load(['category', 'images']);
         });
+    }
+
+    private function storeImage(object $image): string
+    {
+        $filename = Str::uuid() . '.' . $image->getClientOriginalExtension();
+        $image->move(public_path('products'), $filename);
+        return 'products/' . $filename;
+    }
+
+    private function deleteImage(?string $path): void
+    {
+        if (!$path) return;
+        $relative = ltrim(str_replace('/storage/', '', $path), '/');
+        $full = public_path($relative);
+        if (is_file($full)) @unlink($full);
     }
 }

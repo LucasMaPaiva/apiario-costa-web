@@ -5,6 +5,7 @@ namespace App\Services\Product;
 use App\Models\Product;
 use App\Repositories\ProductRepository;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 class StoreProductService
 {
@@ -16,17 +17,15 @@ class StoreProductService
     {
         return DB::transaction(function () use ($data, $main_image, $carousel_images) {
             if ($main_image) {
-                $path = $main_image->store('products', 'public');
-                $data['image_path'] = '/storage/' . $path;
+                $data['image_path'] = $this->storeImage($main_image);
             }
 
             $product = $this->repository->create($data);
 
             foreach ($carousel_images as $index => $image) {
-                $path = $image->store('products', 'public');
                 $this->repository->createImage([
                     'product_id' => $product->id,
-                    'path' => '/storage/' . $path,
+                    'path' => $this->storeImage($image),
                     'is_main' => false,
                     'order' => $index
                 ]);
@@ -34,5 +33,12 @@ class StoreProductService
 
             return $product->load(['category', 'images']);
         });
+    }
+
+    private function storeImage(object $image): string
+    {
+        $filename = Str::uuid() . '.' . $image->getClientOriginalExtension();
+        $image->move(public_path('products'), $filename);
+        return 'products/' . $filename;
     }
 }

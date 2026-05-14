@@ -4,7 +4,6 @@ namespace App\Services\Product;
 
 use App\Repositories\ProductRepository;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage;
 
 class DeleteProductService
 {
@@ -17,17 +16,20 @@ class DeleteProductService
         return DB::transaction(function () use ($id) {
             $product = $this->repository->find($id);
 
-            if ($product->image_path) {
-                $oldPath = str_replace('/storage/', '', $product->image_path);
-                Storage::disk('public')->delete($oldPath);
-            }
-
+            $this->deleteImage($product->image_path);
             foreach ($product->images as $image) {
-                $oldPath = str_replace('/storage/', '', $image->path);
-                Storage::disk('public')->delete($oldPath);
+                $this->deleteImage($image->path);
             }
 
             return $this->repository->delete($product);
         });
+    }
+
+    private function deleteImage(?string $path): void
+    {
+        if (!$path) return;
+        $relative = ltrim(str_replace('/storage/', '', $path), '/');
+        $full = public_path($relative);
+        if (is_file($full)) @unlink($full);
     }
 }

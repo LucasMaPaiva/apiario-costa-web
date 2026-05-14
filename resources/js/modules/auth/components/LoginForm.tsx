@@ -16,10 +16,10 @@ export default function LoginForm() {
 
         try {
             console.log('Fetching CSRF cookie...');
-            const data = await loginService({ email, password });
-            console.log('Login successful, data:', data);
+            const response = await loginService({ email, password });
+            console.log('Login successful, response:', response);
             
-            localStorage.setItem('auth_token', data.access_token);
+            localStorage.setItem('auth_token', response.data.access_token);
             window.location.assign('/admin'); 
         } catch (err: any) {
             console.error('Submission error:', err);

@@ -14,20 +14,58 @@
   --font-serif: "Playfair Display", serif;
   --font-sans: "Montserrat", sans-serif;
 
-  --color-brand-mel: #FFA400;
-  --color-brand-wine: #8B3F3F;
-  --color-brand-gold: #F9B63C;
-  --color-brand-dark: #1A1A1A;
-  --color-brand-white: #FFFFFF;
-  --color-brand-bg: #FAFAFA;
+  --color-brand-mel: var(--brand-mel);
+  --color-brand-wine: var(--brand-wine);
+  --color-brand-gold: var(--brand-gold);
+  
+  --color-bg-main: var(--bg-main);
+  --color-surface: var(--surface);
+  --color-surface-raised: var(--surface-raised);
+  --color-border: var(--border-color);
+  
+  --color-text-primary: var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
+  
+  --color-sidebar-bg: var(--sidebar-bg);
+  --color-sidebar-text: var(--sidebar-text);
+}
+
+:root {
+  --brand-mel: #FFA400;
+  --brand-wine: #8B3F3F;
+  --brand-gold: #F9B63C;
+  
+  --bg-main: #FAFAFA;
+  --surface: #FFFFFF;
+  --surface-raised: #FFFFFF;
+  --border-color: #F1F5F9;
+  
+  --text-primary: #1A1A1A;
+  --text-secondary: #64748B;
+  
+  --sidebar-bg: #1E293B; /* Slate 800 - Modern SaaS look */
+  --sidebar-text: #94A3B8;
+}
+
+.dark {
+  --bg-main: #0F172A; /* Slate 900 */
+  --surface: #1E293B; /* Slate 800 */
+  --surface-raised: #334155; /* Slate 700 */
+  --border-color: #334155;
+  
+  --text-primary: #F8FAFC;
+  --text-secondary: #94A3B8;
+  
+  --sidebar-bg: #020617; /* Slate 950 */
+  --sidebar-text: #64748B;
 }
 
 @layer base {
   body {
-    @apply font-sans text-brand-dark bg-brand-bg leading-relaxed;
+    @apply font-sans text-text-primary bg-bg-main leading-relaxed transition-colors duration-300;
   }
   h1, h2, h3, h4, h5, h6 {
-    @apply font-serif font-bold text-brand-dark;
+    @apply font-serif font-bold text-text-primary;
   }
 }
 

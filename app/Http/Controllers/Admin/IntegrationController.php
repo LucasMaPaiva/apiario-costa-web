@@ -81,11 +81,10 @@ class IntegrationController extends Controller
                 ]
             );
 
-            // Redireciona de volta para o painel administrativo
-            return redirect('/admin/logistica?success=true');
+            return redirect('/admin/configuracoes?tab=logistics&success=true');
 
         } catch (\Exception $e) {
-            return redirect('/admin/logistica?error=' . urlencode($e->getMessage()));
+            return redirect('/admin/configuracoes?tab=logistics&error=' . urlencode($e->getMessage()));
         }
     }
 }

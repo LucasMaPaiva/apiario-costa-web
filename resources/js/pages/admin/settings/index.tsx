@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { Truck, MapPin, Settings as SettingsIcon } from 'lucide-react';
 import AdminIntegrations from './Integrations';
 import StoreAddress from './StoreAddress';
@@ -6,7 +7,9 @@ import StoreAddress from './StoreAddress';
 type Tab = 'logistics' | 'address';
 
 export default function Settings() {
-    const [active_tab, set_active_tab] = useState<Tab>('address');
+    const [search_params] = useSearchParams();
+    const initial_tab: Tab = search_params.get('tab') === 'logistics' ? 'logistics' : 'address';
+    const [active_tab, set_active_tab] = useState<Tab>(initial_tab);
 
     return (
         <div className="max-w-4xl mx-auto">

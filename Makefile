@@ -1,8 +1,3 @@
-ifneq (,$(wildcard .env))
-    include .env
-    export
-endif
-
 install: build setup-networks up
 	docker compose exec app composer install
 	docker compose exec app php artisan key:generate --ansi
@@ -20,7 +15,8 @@ fix-permissions:
 	docker compose exec app chmod -R 777 storage bootstrap/cache
 
 setup-networks:
-	@NET=$${NPM_NETWORK:-nginx-proxy-manager}; \
+	@NET=$$(grep -E '^NPM_NETWORK=' .env 2>/dev/null | cut -d= -f2- | tr -d '"'); \
+	NET=$${NET:-nginx-proxy-manager}; \
 	docker network inspect $$NET >/dev/null 2>&1 || docker network create $$NET
 
 build:

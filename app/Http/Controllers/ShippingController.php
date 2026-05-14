@@ -3,19 +3,19 @@
 namespace App\Http\Controllers;
 
 use App\Services\Logistics\MelhorEnvioService;
+use App\Services\Logistics\ShippingRuleResolver;
 use Illuminate\Http\Request;
 
 class ShippingController extends Controller
 {
-    protected MelhorEnvioService $melhorEnvio;
-
-    public function __construct(MelhorEnvioService $melhorEnvio)
-    {
-        $this->melhorEnvio = $melhorEnvio;
-    }
+    public function __construct(
+        protected MelhorEnvioService $melhorEnvio,
+        protected ShippingRuleResolver $ruleResolver,
+    ) {}
 
     /**
-     * Calcula o frete baseado no CEP e nos itens do carrinho
+     * Calcula o frete baseado no CEP e nos itens do carrinho.
+     * Primeiro tenta uma regra local; se nenhuma casar, cai para o Melhor Envio.
      */
     public function calculate(Request $request)
     {
@@ -26,21 +26,30 @@ class ShippingController extends Controller
             'items.*.quantity' => 'required|integer|min:1',
         ]);
 
-        // Carregar dimensões reais dos produtos do banco para segurança
+        $rule = $this->ruleResolver->resolve($request->cep);
+        if ($rule) {
+            return response()->json(['data' => [[
+                'id' => 'local-' . $rule->id,
+                'name' => $rule->name,
+                'price' => (float) $rule->flat_price,
+                'delivery_time' => $rule->delivery_days,
+                'company' => 'Apiário Costa',
+                'company_logo' => '/logo.jpg',
+            ]]]);
+        }
+
         $items = collect($request->items)->map(function ($item) {
             $product = \App\Models\Product::find($item['id']);
-            if ($product) {
-                return [
-                    'id' => $product->id,
-                    'width' => $product->width,
-                    'height' => $product->height,
-                    'length' => $product->length,
-                    'weight' => $product->weight,
-                    'price' => $product->price,
-                    'quantity' => $item['quantity'],
-                ];
-            }
-            return null;
+            if (!$product) return null;
+            return [
+                'id' => $product->id,
+                'width' => $product->width,
+                'height' => $product->height,
+                'length' => $product->length,
+                'weight' => $product->weight,
+                'price' => $product->price,
+                'quantity' => $item['quantity'],
+            ];
         })->filter()->toArray();
 
         if (empty($items)) {
@@ -49,23 +58,17 @@ class ShippingController extends Controller
 
         try {
             $quotes = $this->melhorEnvio->calculate($request->cep, $items);
-            
-            // Filtrar apenas opções que não retornaram erro
-            $options = collect($quotes)->filter(function ($quote) {
-                return !isset($quote['error']);
-            })->map(function ($quote) {
-                return [
-                    'id' => $quote['id'],
-                    'name' => $quote['name'],
-                    'price' => (float) $quote['price'],
-                    'delivery_time' => $quote['delivery_time'],
-                    'company' => $quote['company']['name'],
-                    'company_logo' => $quote['company']['picture'],
-                ];
-            })->values();
+
+            $options = collect($quotes)->filter(fn($q) => !isset($q['error']))->map(fn($q) => [
+                'id' => $q['id'],
+                'name' => $q['name'],
+                'price' => (float) $q['price'],
+                'delivery_time' => $q['delivery_time'],
+                'company' => $q['company']['name'],
+                'company_logo' => $q['company']['picture'],
+            ])->values();
 
             return response()->json(['data' => $options]);
-
         } catch (\Exception $e) {
             return response()->json(['message' => $e->getMessage()], 500);
         }

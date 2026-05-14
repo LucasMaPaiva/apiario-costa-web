@@ -21,9 +21,9 @@ class MelhorEnvioService
         $this->redirectUri = config('services.melhor_envio.redirect_uri');
         
         $environment = config('services.melhor_envio.environment', 'sandbox');
-        $this->baseUrl = $environment === 'production' 
-            ? 'https://melhorenvio.com.br' 
-            : 'https://sandbox.melhorenvio.com.br';
+        $this->baseUrl = $environment === 'production'
+            ? 'https://app.melhorenvio.com.br'
+            : 'https://app-sandbox.melhorenvio.com.br';
     }
 
     /**

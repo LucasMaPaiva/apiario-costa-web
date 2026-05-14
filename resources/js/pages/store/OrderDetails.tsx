@@ -3,6 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import { Package, Truck, CreditCard, MapPin, ArrowLeft, ExternalLink, Calendar, Hash, ShoppingBag, CheckCircle2, XCircle, Clock } from 'lucide-react';
 import httpClient from '../../common/services/httpClient';
 import { motion } from 'motion/react';
+import { formatBRL } from '../../common/utils/formatBRL';
 
 export default function OrderDetails() {
     const { id } = useParams();
@@ -111,10 +112,10 @@ export default function OrderDetails() {
                                         </div>
                                         <div className="flex-1">
                                             <h3 className="font-bold text-text-primary italic group-hover:text-brand-mel transition-colors">{item.product.name}</h3>
-                                            <p className="text-xs text-text-secondary font-bold uppercase tracking-widest">{item.quantity}x • R$ {parseFloat(item.price).toFixed(2)}</p>
+                                            <p className="text-xs text-text-secondary font-bold uppercase tracking-widest">{item.quantity}x • {formatBRL(item.price)}</p>
                                         </div>
                                         <div className="text-right">
-                                            <p className="font-black italic text-brand-mel">R$ {(item.quantity * parseFloat(item.price)).toFixed(2)}</p>
+                                            <p className="font-black italic text-brand-mel">{formatBRL(item.quantity * parseFloat(item.price))}</p>
                                         </div>
                                     </div>
                                 ))}
@@ -131,15 +132,15 @@ export default function OrderDetails() {
                             <div className="space-y-4 text-sm font-bold uppercase tracking-widest opacity-70">
                                 <div className="flex justify-between">
                                     <span>Itens</span>
-                                    <span>R$ {order.items.reduce((acc: number, item: any) => acc + (item.quantity * parseFloat(item.price)), 0).toFixed(2)}</span>
+                                    <span>{formatBRL(order.items.reduce((acc: number, item: any) => acc + (item.quantity * parseFloat(item.price)), 0))}</span>
                                 </div>
                                 <div className="flex justify-between">
                                     <span>Frete</span>
-                                    <span>R$ {parseFloat(order.shipping_cost || 0).toFixed(2)}</span>
+                                    <span>{formatBRL(order.shipping_cost || 0)}</span>
                                 </div>
                                 <div className="border-t border-white/10 pt-4 flex justify-between items-end opacity-100">
                                     <span className="text-brand-mel text-[10px]">Total Geral</span>
-                                    <span className="text-3xl font-black italic text-brand-mel tracking-tighter">R$ {parseFloat(order.total_amount).toFixed(2)}</span>
+                                    <span className="text-3xl font-black italic text-brand-mel tracking-tighter">{formatBRL(order.total_amount)}</span>
                                 </div>
                             </div>
                         </div>

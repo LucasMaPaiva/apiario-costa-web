@@ -3,6 +3,7 @@ import { ShoppingCart, ExternalLink, Loader2, ImageOff } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { fetchProducts, Product } from "../../products/services/productService";
+import { formatBRL } from "../../../common/utils/formatBRL";
 
 export default function Products() {
   const [products, setProducts] = useState<Product[]>([]);
@@ -53,9 +54,9 @@ export default function Products() {
                 className="bg-surface rounded-2xl overflow-hidden border border-border hover:shadow-2xl hover:border-brand-mel/30 transition-all group flex flex-col h-full"
               >
                 <div className="relative h-64 overflow-hidden bg-bg-main flex items-center justify-center">
-                  {product.image_path ? (
+                  {product.image_url ? (
                     <img
-                      src={product.image_path}
+                      src={product.image_url}
                       alt={product.name}
                       className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                     />
@@ -77,7 +78,7 @@ export default function Products() {
                     {product.description}
                   </p>
                   <p className="text-lg font-bold text-brand-wine mb-6">
-                    {new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(product.price)}
+                    {formatBRL(product.price)}
                   </p>
                   <Link
                     to={`/produto/${product.slug}`}

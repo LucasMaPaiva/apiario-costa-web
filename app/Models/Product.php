@@ -28,7 +28,7 @@ class Product extends Model
     {
         if (!$this->image_path) return '/placeholder.jpg';
         if (str_starts_with($this->image_path, 'http')) return $this->image_path;
-        return asset(ltrim($this->image_path, '/'));
+        return '/' . ltrim($this->image_path, '/');
     }
  
     /**

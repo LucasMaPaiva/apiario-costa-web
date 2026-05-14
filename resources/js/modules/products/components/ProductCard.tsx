@@ -2,6 +2,7 @@ import { ShoppingCart, ShoppingBag } from 'lucide-react';
 import { Product } from '../services/productService';
 import { Link } from 'react-router-dom';
 import { useCart } from '../../cart/context/CartContext';
+import { formatBRL } from '../../../common/utils/formatBRL';
 
 interface ProductCardProps {
     product: Product;
@@ -14,9 +15,9 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
         <div className="bg-surface rounded-2xl shadow-sm border border-border overflow-hidden hover:shadow-md transition-shadow group">
             <Link to={`/produto/${product.slug}`} className="block relative">
                 <div className="aspect-square bg-bg-main flex items-center justify-center p-8 overflow-hidden">
-                    {product.image_path ? (
-                        <img 
-                            src={product.image_path} 
+                    {product.image_url ? (
+                        <img
+                            src={product.image_url}
                             alt={product.name} 
                             className="w-full h-full object-contain p-4 transition-transform duration-500 group-hover:scale-110" 
                         />
@@ -39,7 +40,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
                         {product.category?.name || 'Geral'}
                     </span>
                     <span className="text-text-primary font-bold">
-                        R$ {Number(product.price).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                        {formatBRL(product.price)}
                     </span>
                 </div>
                 <Link to={`/produto/${product.slug}`}>

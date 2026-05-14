@@ -2,6 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { useAdminOrders } from '../../../modules/admin/hooks/useAdminOrders';
 import { ShoppingBag, User, Calendar, MapPin, Eye, ExternalLink } from 'lucide-react';
+import { formatBRL } from '../../../common/utils/formatBRL';
 
 const status_colors: any = {
     'pending': 'bg-yellow-500/10 text-yellow-500 border-yellow-500/20',
@@ -71,7 +72,7 @@ export default function AdminOrdersList() {
                                     </td>
                                     <td className="px-8 py-6">
                                         <span className="text-sm font-black text-brand-mel">
-                                            R$ {Number(order.total_amount).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                                            {formatBRL(order.total_amount)}
                                         </span>
                                     </td>
                                     <td className="px-8 py-6">

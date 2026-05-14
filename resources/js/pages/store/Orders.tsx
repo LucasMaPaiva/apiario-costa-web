@@ -3,6 +3,7 @@ import { ShoppingBag, Package, Clock, ChevronRight, ExternalLink } from 'lucide-
 import { fetchUserOrders } from '../../modules/orders/services/orderService';
 import { Link } from 'react-router-dom';
 import { motion } from 'motion/react';
+import { formatBRL } from '../../common/utils/formatBRL';
 
 export default function MyOrders() {
     const [orders, setOrders] = useState<any[]>([]);
@@ -129,11 +130,11 @@ export default function MyOrders() {
 
                                         <div className="text-right">
                                             <div className="space-y-1 mb-4 opacity-60">
-                                                <p className="text-[9px] font-bold uppercase tracking-widest">Produtos: R$ {order.items.reduce((acc: number, item: any) => acc + (item.quantity * parseFloat(item.price)), 0).toFixed(2)}</p>
-                                                <p className="text-[9px] font-bold uppercase tracking-widest">Frete: R$ {parseFloat(order.shipping_cost || 0).toFixed(2)}</p>
+                                                <p className="text-[9px] font-bold uppercase tracking-widest">Produtos: {formatBRL(order.items.reduce((acc: number, item: any) => acc + (item.quantity * parseFloat(item.price)), 0))}</p>
+                                                <p className="text-[9px] font-bold uppercase tracking-widest">Frete: {formatBRL(order.shipping_cost || 0)}</p>
                                             </div>
                                             <p className="text-[10px] font-black text-text-secondary uppercase tracking-widest mb-1">Total do Pedido</p>
-                                            <p className="text-3xl font-black italic text-brand-mel tracking-tighter">R$ {parseFloat(order.total_amount).toFixed(2)}</p>
+                                            <p className="text-3xl font-black italic text-brand-mel tracking-tighter">{formatBRL(order.total_amount)}</p>
                                         </div>
                                     </div>
                                 </div>

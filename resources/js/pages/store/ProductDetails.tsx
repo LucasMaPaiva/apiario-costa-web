@@ -4,6 +4,7 @@ import { fetchProductBySlug, Product } from '../../modules/products/services/pro
 import { Loader2, ArrowLeft, ShoppingBag, ShieldCheck, Truck, RefreshCcw, Plus, Minus } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { useCart } from '../../modules/cart/context/CartContext';
+import { formatBRL } from '../../common/utils/formatBRL';
 
 export default function ProductDetails() {
     const { slug } = useParams<{ slug: string }>();
@@ -19,7 +20,7 @@ export default function ProductDetails() {
             try {
                 const data = await fetchProductBySlug(slug);
                 setProduct(data);
-                set_active_image(data.image_path);
+                set_active_image(data.image_url);
             } catch (error) {
                 console.error('Failed to load product:', error);
             } finally {
@@ -50,8 +51,8 @@ export default function ProductDetails() {
     }
 
     const all_images = [
-        product.image_path,
-        ...(product.images?.map(img => img.image_path) || [])
+        product.image_url,
+        ...(product.images?.map(img => img.image_url) || [])
     ].filter(Boolean) as string[];
 
     return (
@@ -120,7 +121,7 @@ export default function ProductDetails() {
                             
                             <div className="flex items-baseline gap-4 mb-8">
                                 <span className="text-4xl font-black text-brand-wine italic">
-                                    R$ {Number(product.price).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                                    {formatBRL(product.price)}
                                 </span>
                                 <span className="text-xs text-text-secondary font-bold uppercase tracking-widest">
                                     Preço por Unidade
@@ -153,7 +154,7 @@ export default function ProductDetails() {
                                     </div>
                                     <div className="text-right">
                                         <span className="block text-[9px] uppercase tracking-widest text-text-secondary font-bold mb-1">Total Estimado</span>
-                                        <span className="text-2xl font-black text-text-primary">R$ {(product.price * quantity).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
+                                        <span className="text-2xl font-black text-text-primary">{formatBRL(product.price * quantity)}</span>
                                     </div>
                                 </div>
 

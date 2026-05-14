@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { Plus, Edit, Trash2, Eye, EyeOff, Search, ChevronLeft, ChevronRight, PackageOpen, TrendingUp, CheckCircle2 } from 'lucide-react';
 import { useAdminProducts } from '../../modules/admin/hooks/useAdminProducts';
 import { useAdminCategories } from '../../modules/admin/hooks/useAdminCategories';
+import { formatBRL } from '../../common/utils/formatBRL';
 
 export default function AdminProductsList() {
     const { products, loading, pagination, filters, updateFilters, goToPage, handleToggleActive, handleDeleteProduct } = useAdminProducts();
@@ -145,7 +146,7 @@ export default function AdminProductsList() {
                                             </span>
                                         </td>
                                         <td className="p-8 text-center">
-                                            <span className="font-black text-text-primary text-lg">R$ {Number(product.price).toFixed(2).replace('.', ',')}</span>
+                                            <span className="font-black text-text-primary text-lg">{formatBRL(product.price)}</span>
                                         </td>
                                         <td className="p-8 text-center">
                                             <div className={`inline-flex items-center justify-center min-w-[3rem] h-12 px-4 rounded-2xl text-sm font-black ${

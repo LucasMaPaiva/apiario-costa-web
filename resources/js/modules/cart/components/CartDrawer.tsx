@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { X, ShoppingBag, Plus, Minus, Trash2, ArrowRight } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { Link } from 'react-router-dom';
+import { formatBRL } from '../../../common/utils/formatBRL';
 
 export default function CartDrawer() {
     const { 
@@ -72,7 +73,7 @@ export default function CartDrawer() {
                                     <div key={item.id} className="flex gap-4 group">
                                         <div className="w-24 h-24 bg-bg-main rounded-2xl p-4 flex-shrink-0 border border-gray-50 overflow-hidden">
                                             <img 
-                                                src={item.image_path || ''} 
+                                                src={item.image_url || item.image_path || ''}
                                                 alt={item.name} 
                                                 className="w-full h-full object-contain group-hover:scale-110 transition-transform duration-500"
                                             />
@@ -88,7 +89,7 @@ export default function CartDrawer() {
                                                 </button>
                                             </div>
                                             <p className="text-[10px] text-brand-mel font-black uppercase tracking-widest mb-3">
-                                                R$ {item.price.toFixed(2)}
+                                                {formatBRL(item.price)}
                                             </p>
                                             <div className="flex items-center justify-between">
                                                 <div className="flex items-center gap-3 bg-bg-main p-1 rounded-lg border border-gray-100">
@@ -107,7 +108,7 @@ export default function CartDrawer() {
                                                     </button>
                                                 </div>
                                                 <span className="text-xs font-black text-brand-dark tracking-tighter">
-                                                    R$ {(item.price * item.quantity).toFixed(2)}
+                                                    {formatBRL(item.price * item.quantity)}
                                                 </span>
                                             </div>
                                         </div>
@@ -123,7 +124,7 @@ export default function CartDrawer() {
                                     <div>
                                         <span className="block text-[9px] uppercase tracking-[0.3em] text-gray-400 font-bold mb-1">Subtotal</span>
                                         <span className="text-3xl font-black text-brand-dark italic tracking-tighter">
-                                            R$ {cart_total.toFixed(2)}
+                                            {formatBRL(cart_total)}
                                         </span>
                                     </div>
                                     <div className="text-right">

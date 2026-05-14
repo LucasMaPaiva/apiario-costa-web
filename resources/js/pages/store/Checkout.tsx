@@ -5,6 +5,7 @@ import { createOrder, OrderData } from '../../modules/orders/services/orderServi
 import { ShoppingBag, ArrowLeft, CheckCircle2, Loader2, MapPin, Truck, CreditCard } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'motion/react';
+import { formatBRL } from '../../common/utils/formatBRL';
 
 export default function Checkout() {
     const { cart, cart_total, clearCart } = useCart();
@@ -236,8 +237,9 @@ export default function Checkout() {
                                         <input
                                             name="cep"
                                             required
+                                            maxLength={9}
                                             value={address.cep}
-                                            onChange={handleChange}
+                                            onChange={(e) => handleCepChange(e.target.value)}
                                             className="w-full px-4 py-3 bg-bg-main border border-border rounded-xl focus:outline-none focus:border-brand-mel transition-colors text-sm text-text-primary"
                                             placeholder="00000-000"
                                         />
@@ -281,7 +283,6 @@ export default function Checkout() {
                                             required
                                             value={address.neighborhood}
                                             onChange={handleChange}
-                                            readOnly={address.cep.length === 8 && !!address.neighborhood}
                                             className="w-full px-4 py-3 bg-bg-main border border-border rounded-xl focus:outline-none focus:border-brand-mel transition-colors text-sm text-text-primary"
                                             placeholder="Nome do bairro"
                                         />
@@ -294,7 +295,6 @@ export default function Checkout() {
                                                 required
                                                 value={address.city}
                                                 onChange={handleChange}
-                                                readOnly={address.cep.length === 8 && !!address.city}
                                                 className="w-full px-4 py-3 bg-bg-main border border-border rounded-xl focus:outline-none focus:border-brand-mel transition-colors text-sm text-text-primary"
                                                 placeholder="Cidade"
                                             />
@@ -307,7 +307,6 @@ export default function Checkout() {
                                                 maxLength={2}
                                                 value={address.state}
                                                 onChange={handleChange}
-                                                readOnly={address.cep.length === 8 && !!address.state}
                                                 className="w-full px-4 py-3 bg-bg-main border border-border rounded-xl focus:outline-none focus:border-brand-mel transition-colors text-sm text-text-primary"
                                                 placeholder="SP"
                                             />
@@ -349,7 +348,7 @@ export default function Checkout() {
                                                         <p className="text-[10px] text-text-secondary font-bold uppercase tracking-widest">{option.delivery_time} dias úteis • {option.company}</p>
                                                     </div>
                                                 </div>
-                                                <span className="text-sm font-black text-brand-mel">R$ {option.price.toFixed(2)}</span>
+                                                <span className="text-sm font-black text-brand-mel">{formatBRL(option.price)}</span>
                                             </div>
                                         ))}
                                     </div>
@@ -385,7 +384,7 @@ export default function Checkout() {
                                     {cart.map(item => (
                                         <div key={item.id} className="flex justify-between items-center text-sm">
                                             <span className="opacity-70">{item.quantity}x {item.name}</span>
-                                            <span className="font-bold tracking-tighter">R$ {(item.price * item.quantity).toFixed(2)}</span>
+                                            <span className="font-bold tracking-tighter">{formatBRL(item.price * item.quantity)}</span>
                                         </div>
                                     ))}
                                 </div>
@@ -393,16 +392,16 @@ export default function Checkout() {
                                 <div className="border-t border-brand-white/10 pt-6 space-y-3">
                                     <div className="flex justify-between text-xs opacity-60 uppercase tracking-widest font-bold">
                                         <span>Subtotal</span>
-                                        <span>R$ {cart_total.toFixed(2)}</span>
+                                        <span>{formatBRL(cart_total)}</span>
                                     </div>
                                     <div className="flex justify-between text-xs opacity-60 uppercase tracking-widest font-bold">
                                         <span>Frete</span>
-                                        <span>{selected_shipping ? `R$ ${selected_shipping.price.toFixed(2)}` : 'A calcular'}</span>
+                                        <span>{selected_shipping ? formatBRL(selected_shipping.price) : 'A calcular'}</span>
                                     </div>
                                     <div className="flex justify-between items-end pt-4">
                                         <span className="text-[10px] uppercase tracking-[0.3em] font-black text-brand-mel">Total</span>
                                         <span className="text-4xl font-black italic tracking-tighter text-brand-mel">
-                                            R$ {(cart_total + (selected_shipping?.price || 0)).toFixed(2)}
+                                            {formatBRL(cart_total + (selected_shipping?.price || 0))}
                                         </span>
                                     </div>
                                 </div>

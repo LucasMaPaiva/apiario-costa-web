@@ -13,6 +13,7 @@ export interface Product {
     description: string;
     price: number;
     image_path: string | null;
+    image_url: string | null;
     stock: number;
     category?: {
         name: string;
@@ -20,7 +21,8 @@ export interface Product {
     };
     images?: Array<{
         id: number;
-        image_path: string;
+        path: string;
+        image_url: string;
     }>;
 }
 

@@ -13,6 +13,15 @@ class ProductImage extends Model
         'order',
     ];
 
+    protected $appends = ['image_url'];
+
+    public function getImageUrlAttribute(): ?string
+    {
+        if (!$this->path) return null;
+        if (str_starts_with($this->path, 'http')) return $this->path;
+        return '/' . ltrim($this->path, '/');
+    }
+
     public function product(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(Product::class);

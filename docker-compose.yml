@@ -1,9 +1,12 @@
+name: apiario-costa-prod
+
 services:
   app:
     build:
       context: .
       dockerfile: .docker/php-fpm/Dockerfile
-    container_name: apiario-costa-app
+    container_name: apiario-costa-app-prod
+    restart: unless-stopped
     volumes:
       - .:/var/www/html
     networks:
@@ -18,7 +21,8 @@ services:
     build:
       context: .
       dockerfile: .docker/nginx/Dockerfile
-    container_name: apiario-costa-web
+    container_name: apiario-costa-web-prod
+    restart: unless-stopped
     ports:
       - "${APP_PORT:-8000}:80"
     volumes:
@@ -36,7 +40,8 @@ services:
     build:
       context: .
       dockerfile: .docker/pgsql/Dockerfile
-    container_name: apiario-costa-db
+    container_name: apiario-costa-db-prod
+    restart: unless-stopped
     environment:
       POSTGRES_DB: ${DB_DATABASE:-apiario}
       POSTGRES_USER: ${DB_USERNAME:-apiario}

@@ -11,8 +11,6 @@ services:
       - .:/var/www/html
     networks:
       - apiario-network
-    ports:
-      - "5173:5173" # Vite (React)
     profiles:
       - local
       - prod

@@ -2,10 +2,12 @@
 
 namespace App\Services\Order;
 
+use App\Mail\OrderConfirmed;
 use App\Models\Order;
 use App\Models\Product;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
 
 class StoreOrderService
 {
@@ -68,7 +70,12 @@ class StoreOrderService
                 }
             }
 
-            return $order->load('items.product');
+            $order->load('items.product', 'user');
+
+            Mail::to($order->user->email)->send(new OrderConfirmed($order));
+            Mail::to(config('mail.admin_address'))->send(new OrderConfirmed($order));
+
+            return $order;
         });
     }
 }

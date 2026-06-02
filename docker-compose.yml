@@ -1,15 +1,18 @@
+name: apiario-costa-homolog
+
 services:
   app:
     build:
       context: .
       dockerfile: .docker/php-fpm/Dockerfile
-    container_name: apiario-costa-app
+    container_name: apiario-costa-app-homolog
+    restart: unless-stopped
     volumes:
       - .:/var/www/html
     networks:
       - apiario-network
     ports:
-      - "5173:5173" # Vite (React)
+      - "5174:5173" # Vite (React)
     profiles:
       - local
       - prod
@@ -18,9 +21,10 @@ services:
     build:
       context: .
       dockerfile: .docker/nginx/Dockerfile
-    container_name: apiario-costa-web
+    container_name: apiario-costa-web-homolog
+    restart: unless-stopped
     ports:
-      - "${APP_PORT:-8000}:80"
+      - "${APP_PORT:-8001}:80"
     volumes:
       - .:/var/www/html
     depends_on:
@@ -36,13 +40,14 @@ services:
     build:
       context: .
       dockerfile: .docker/pgsql/Dockerfile
-    container_name: apiario-costa-db
+    container_name: apiario-costa-db-homolog
+    restart: unless-stopped
     environment:
       POSTGRES_DB: ${DB_DATABASE:-apiario}
       POSTGRES_USER: ${DB_USERNAME:-apiario}
       POSTGRES_PASSWORD: ${DB_PASSWORD:-apiario}
     ports:
-      - "${FORWARD_DB_PORT:-5432}:5432"
+      - "${FORWARD_DB_PORT:-5433}:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
     networks:

@@ -2,8 +2,11 @@
 
 namespace App\Services\Payment;
 
+use App\Mail\PaymentConfirmed;
+use App\Mail\PaymentConfirmedAdmin;
 use App\Models\Order;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use MercadoPago\Client\Payment\PaymentClient;
 use MercadoPago\Client\Preference\PreferenceClient;
 use MercadoPago\MercadoPagoConfig;
@@ -101,13 +104,22 @@ class MercadoPagoService
             default                     => 'pending',
         };
 
+        $previous_payment_status = $order->payment_status;
+
         $order->update([
             'payment_status' => $payment_status,
             'transaction_id' => (string) $payment_id,
         ]);
 
         if ($payment_status === 'paid' && $order->status === 'pending') {
-            $order->update(['status' => 'processing']);
+            $order->update(['status' => 'paid']);
+        }
+
+        if ($payment_status === 'paid' && $previous_payment_status !== 'paid') {
+            $order->load('items.product', 'user');
+
+            Mail::to($order->user->email)->send(new PaymentConfirmed($order));
+            Mail::to(config('mail.admin_address'))->send(new PaymentConfirmedAdmin($order));
         }
     }
 

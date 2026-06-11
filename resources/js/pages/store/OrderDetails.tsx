@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, Link, useSearchParams } from 'react-router-dom';
-import { Package, Truck, CreditCard, MapPin, ArrowLeft, ExternalLink, Calendar, Hash, ShoppingBag, CheckCircle2, XCircle, Clock, Loader2 } from 'lucide-react';
+import { Package, Truck, CreditCard, MapPin, ArrowLeft, ExternalLink, Calendar, Hash, ShoppingBag, CheckCircle2, XCircle, Clock, Loader2, MessageCircle } from 'lucide-react';
 import httpClient from '../../common/services/httpClient';
 import { motion } from 'motion/react';
 import { formatBRL } from '../../common/utils/formatBRL';
@@ -63,6 +63,7 @@ export default function OrderDetails() {
     const getStatusInfo = (status: string) => {
         const info: any = {
             'pending': { label: 'Pendente', color: 'text-yellow-600', bg: 'bg-yellow-500/10', icon: <Clock size={20} /> },
+            'paid': { label: 'Pago', color: 'text-green-600', bg: 'bg-green-500/10', icon: <CheckCircle2 size={20} /> },
             'processing': { label: 'Em Preparação', color: 'text-blue-600', bg: 'bg-blue-500/10', icon: <Package size={20} /> },
             'shipped': { label: 'Enviado', color: 'text-brand-mel', bg: 'bg-brand-mel/10', icon: <Truck size={20} /> },
             'delivered': { label: 'Entregue', color: 'text-green-600', bg: 'bg-green-500/10', icon: <CheckCircle2 size={20} /> },
@@ -95,7 +96,7 @@ export default function OrderDetails() {
                         )}
                         <span>
                             {order.payment_status === 'paid'
-                                ? 'Pagamento aprovado! Seu pedido já está sendo preparado.'
+                                ? 'Pagamento aprovado! Logo logo estaremos preparando seu pedido.'
                                 : payment_query === 'failure'
                                     ? 'Não conseguimos confirmar seu pagamento. Tente novamente ou entre em contato conosco.'
                                     : 'Estamos confirmando seu pagamento (Pix pode levar alguns instantes). Esta página vai atualizar sozinha.'}
@@ -210,6 +211,24 @@ export default function OrderDetails() {
                                 <p className="text-[10px] opacity-60">Método: Manual / Cobrança Direta</p>
                             </div>
                         </div>
+
+                        {/* WhatsApp Card */}
+                        <a
+                            href={`https://wa.me/559595991610579?text=${encodeURIComponent(
+                                `Oi! Fiz o pedido #${order.id} com os itens: ${order.items.map((item: any) => `${item.quantity}x ${item.product.name}`).join(', ')}. Tenho uma dúvida e gostaria de ajuda.`
+                            )}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="bg-[#25D366]/10 border border-[#25D366]/30 rounded-[2rem] p-8 shadow-sm flex items-center gap-4 hover:bg-[#25D366]/20 transition-colors group"
+                        >
+                            <div className="w-12 h-12 bg-[#25D366] text-white rounded-2xl flex items-center justify-center flex-shrink-0">
+                                <MessageCircle size={22} />
+                            </div>
+                            <div>
+                                <p className="font-black italic text-text-primary group-hover:text-[#25D366] transition-colors">Alguma dúvida ou ajuda com seu pedido?</p>
+                                <p className="text-xs font-bold text-text-secondary uppercase tracking-widest">Nos mande mensagem</p>
+                            </div>
+                        </a>
                     </div>
                 </div>
             </div>

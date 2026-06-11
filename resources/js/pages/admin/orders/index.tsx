@@ -22,20 +22,6 @@ const status_labels: any = {
     'cancelled': 'Cancelado',
 };
 
-const payment_status_colors: any = {
-    'pending': 'bg-yellow-500/10 text-yellow-500 border-yellow-500/20',
-    'paid': 'bg-green-500/10 text-green-500 border-green-500/20',
-    'failed': 'bg-red-500/10 text-red-500 border-red-500/20',
-    'refunded': 'bg-gray-500/10 text-gray-400 border-gray-500/20',
-};
-
-const payment_status_labels: any = {
-    'pending': 'Pendente',
-    'paid': 'Pago',
-    'failed': 'Falhou',
-    'refunded': 'Reembolsado',
-};
-
 export default function AdminOrdersList() {
     const { orders, loading, pagination, handleUpdateStatus } = useAdminOrders();
 
@@ -59,7 +45,6 @@ export default function AdminOrdersList() {
                                 <th className="px-8 py-6 text-[10px] font-black uppercase tracking-widest text-text-secondary">Cliente</th>
                                 <th className="px-8 py-6 text-[10px] font-black uppercase tracking-widest text-text-secondary">Recebimento</th>
                                 <th className="px-8 py-6 text-[10px] font-black uppercase tracking-widest text-text-secondary">Total</th>
-                                <th className="px-8 py-6 text-[10px] font-black uppercase tracking-widest text-text-secondary">Pagamento</th>
                                 <th className="px-8 py-6 text-[10px] font-black uppercase tracking-widest text-text-secondary">Status</th>
                                 <th className="px-8 py-6 text-[10px] font-black uppercase tracking-widest text-text-secondary">Ações</th>
                             </tr>
@@ -104,11 +89,6 @@ export default function AdminOrdersList() {
                                     <td className="px-8 py-6">
                                         <span className="text-sm font-black text-brand-mel">
                                             {formatBRL(order.total_amount)}
-                                        </span>
-                                    </td>
-                                    <td className="px-8 py-6">
-                                        <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border ${payment_status_colors[order.payment_status] || 'bg-gray-500/10 text-gray-500 border-gray-500/20'}`}>
-                                            {payment_status_labels[order.payment_status] || order.payment_status}
                                         </span>
                                     </td>
                                     <td className="px-8 py-6">

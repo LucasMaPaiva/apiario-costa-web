@@ -6,6 +6,7 @@ import { formatBRL } from '../../../common/utils/formatBRL';
 
 const status_colors: any = {
     'pending': 'bg-yellow-500/10 text-yellow-500 border-yellow-500/20',
+    'processing': 'bg-cyan-500/10 text-cyan-500 border-cyan-500/20',
     'paid': 'bg-green-500/10 text-green-500 border-green-500/20',
     'shipped': 'bg-blue-500/10 text-blue-500 border-blue-500/20',
     'delivered': 'bg-purple-500/10 text-purple-500 border-purple-500/20',
@@ -14,10 +15,25 @@ const status_colors: any = {
 
 const status_labels: any = {
     'pending': 'Pendente',
+    'processing': 'Em Preparação',
     'paid': 'Pago',
     'shipped': 'Enviado',
     'delivered': 'Entregue',
     'cancelled': 'Cancelado',
+};
+
+const payment_status_colors: any = {
+    'pending': 'bg-yellow-500/10 text-yellow-500 border-yellow-500/20',
+    'paid': 'bg-green-500/10 text-green-500 border-green-500/20',
+    'failed': 'bg-red-500/10 text-red-500 border-red-500/20',
+    'refunded': 'bg-gray-500/10 text-gray-400 border-gray-500/20',
+};
+
+const payment_status_labels: any = {
+    'pending': 'Pendente',
+    'paid': 'Pago',
+    'failed': 'Falhou',
+    'refunded': 'Reembolsado',
 };
 
 export default function AdminOrdersList() {
@@ -43,6 +59,7 @@ export default function AdminOrdersList() {
                                 <th className="px-8 py-6 text-[10px] font-black uppercase tracking-widest text-text-secondary">Cliente</th>
                                 <th className="px-8 py-6 text-[10px] font-black uppercase tracking-widest text-text-secondary">Recebimento</th>
                                 <th className="px-8 py-6 text-[10px] font-black uppercase tracking-widest text-text-secondary">Total</th>
+                                <th className="px-8 py-6 text-[10px] font-black uppercase tracking-widest text-text-secondary">Pagamento</th>
                                 <th className="px-8 py-6 text-[10px] font-black uppercase tracking-widest text-text-secondary">Status</th>
                                 <th className="px-8 py-6 text-[10px] font-black uppercase tracking-widest text-text-secondary">Ações</th>
                             </tr>
@@ -90,7 +107,12 @@ export default function AdminOrdersList() {
                                         </span>
                                     </td>
                                     <td className="px-8 py-6">
-                                        <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border ${status_colors[order.status] || 'bg-gray-500/10 text-gray-500'}`}>
+                                        <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border ${payment_status_colors[order.payment_status] || 'bg-gray-500/10 text-gray-500 border-gray-500/20'}`}>
+                                            {payment_status_labels[order.payment_status] || order.payment_status}
+                                        </span>
+                                    </td>
+                                    <td className="px-8 py-6">
+                                        <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border ${status_colors[order.status] || 'bg-gray-500/10 text-gray-500 border-gray-500/20'}`}>
                                             {status_labels[order.status] || order.status}
                                         </span>
                                     </td>

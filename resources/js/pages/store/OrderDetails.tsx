@@ -1,16 +1,19 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
-import { Package, Truck, CreditCard, MapPin, ArrowLeft, ExternalLink, Calendar, Hash, ShoppingBag, CheckCircle2, XCircle, Clock } from 'lucide-react';
+import { useParams, Link, useSearchParams } from 'react-router-dom';
+import { Package, Truck, CreditCard, MapPin, ArrowLeft, ExternalLink, Calendar, Hash, ShoppingBag, CheckCircle2, XCircle, Clock, Loader2 } from 'lucide-react';
 import httpClient from '../../common/services/httpClient';
 import { motion } from 'motion/react';
 import { formatBRL } from '../../common/utils/formatBRL';
 
 export default function OrderDetails() {
     const { id } = useParams();
+    const [searchParams] = useSearchParams();
+    const payment_query = searchParams.get('payment');
     const [order, setOrder] = useState<any>(null);
     const [loading, setLoading] = useState(true);
 
-    const loadOrder = async () => {
+    const loadOrder = async (silent = false) => {
+        if (!silent) setLoading(true);
         try {
             const response = await httpClient.get(`/api/orders/${id}`);
             setOrder(response.data.data);
@@ -24,6 +27,21 @@ export default function OrderDetails() {
     useEffect(() => {
         loadOrder();
     }, [id]);
+
+    // Quando o cliente volta do Mercado Pago, o webhook pode levar alguns
+    // segundos para confirmar o Pix — atualiza o pedido sozinho até confirmar.
+    useEffect(() => {
+        if (!order || order.payment_status === 'paid') return;
+        if (payment_query !== 'success' && payment_query !== 'pending') return;
+
+        const interval = setInterval(() => loadOrder(true), 4000);
+        const timeout = setTimeout(() => clearInterval(interval), 90000);
+
+        return () => {
+            clearInterval(interval);
+            clearTimeout(timeout);
+        };
+    }, [order?.payment_status, payment_query]);
 
     if (loading) {
         return (
@@ -59,6 +77,31 @@ export default function OrderDetails() {
                 <Link to="/meus-pedidos" className="inline-flex items-center gap-2 text-text-secondary hover:text-brand-mel mb-8 transition-colors text-xs font-bold uppercase tracking-widest">
                     <ArrowLeft size={16} /> Voltar para Meus Pedidos
                 </Link>
+
+                {payment_query && (
+                    <div className={`mb-8 p-5 rounded-2xl border flex items-center gap-4 text-sm font-bold ${
+                        order.payment_status === 'paid'
+                            ? 'bg-green-500/10 border-green-500/20 text-green-600'
+                            : payment_query === 'failure'
+                                ? 'bg-red-500/10 border-red-500/20 text-red-600'
+                                : 'bg-yellow-500/10 border-yellow-500/20 text-yellow-700'
+                    }`}>
+                        {order.payment_status === 'paid' ? (
+                            <CheckCircle2 size={22} className="flex-shrink-0" />
+                        ) : payment_query === 'failure' ? (
+                            <XCircle size={22} className="flex-shrink-0" />
+                        ) : (
+                            <Loader2 size={22} className="flex-shrink-0 animate-spin" />
+                        )}
+                        <span>
+                            {order.payment_status === 'paid'
+                                ? 'Pagamento aprovado! Seu pedido já está sendo preparado.'
+                                : payment_query === 'failure'
+                                    ? 'Não conseguimos confirmar seu pagamento. Tente novamente ou entre em contato conosco.'
+                                    : 'Estamos confirmando seu pagamento (Pix pode levar alguns instantes). Esta página vai atualizar sozinha.'}
+                        </span>
+                    </div>
+                )}
 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
                     <div className="lg:col-span-2 space-y-8">

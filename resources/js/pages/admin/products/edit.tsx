@@ -3,7 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useAdminProducts } from '../../../modules/admin/hooks/useAdminProducts';
 import { useAdminCategories } from '../../../modules/admin/hooks/useAdminCategories';
 import httpClient from '../../../common/services/httpClient';
-import { Save, ArrowLeft, Image as ImageIcon, Plus, Info, LayoutGrid, DollarSign, Database, FileText } from 'lucide-react';
+import { Save, ArrowLeft, Image as ImageIcon, Plus, Info, LayoutGrid, DollarSign, Database, FileText, AlertCircle } from 'lucide-react';
 import { adaptProduct } from '../../../modules/admin/models/ProductModel';
 
 export default function AdminProductEdit() {
@@ -37,6 +37,35 @@ export default function AdminProductEdit() {
     const [removedImages, setRemovedImages] = useState<number[]>([]);
     const [newCarouselImages, setNewCarouselImages] = useState<File[]>([]);
     const [newCarouselPreviews, setNewCarouselPreviews] = useState<string[]>([]);
+    const [errors, setErrors] = useState<Record<string, string>>({});
+
+    const clearError = (field: string) => {
+        setErrors(prev => {
+            if (!prev[field]) return prev;
+            const next = { ...prev };
+            delete next[field];
+            return next;
+        });
+    };
+
+    const updateField = (field: string, value: any) => {
+        setFormData(prev => ({ ...prev, [field]: value }));
+        clearError(field);
+    };
+
+    const inputClass = (field: string, base: string) =>
+        errors[field] ? `${base} border-red-500 focus:border-red-500 focus:ring-red-500/10` : base;
+
+    const validate = () => {
+        const newErrors: Record<string, string> = {};
+        if (!formData.name.trim()) newErrors.name = 'Informe o nome do produto.';
+        if (!formData.slug.trim()) newErrors.slug = 'Informe a URL amigável (slug).';
+        if (!formData.category_id) newErrors.category_id = 'Selecione uma categoria.';
+        if (!formData.price || Number(formData.price) <= 0) newErrors.price = 'Informe um preço válido.';
+        if (formData.stock === '' || Number(formData.stock) < 0) newErrors.stock = 'Informe o estoque atual.';
+        if (!mainImage && !mainImagePreview) newErrors.mainImage = 'Selecione uma imagem de capa.';
+        return newErrors;
+    };
 
     useEffect(() => {
         const loadProduct = async () => {
@@ -76,6 +105,8 @@ export default function AdminProductEdit() {
         const name = e.target.value;
         const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
         setFormData({ ...formData, name, slug });
+        clearError('name');
+        clearError('slug');
     };
 
     const handleMainImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -84,6 +115,7 @@ export default function AdminProductEdit() {
             setMainImage(file);
             setMainImagePreview(URL.createObjectURL(file));
             setFormData(prev => ({ ...prev, remove_main_image: false }));
+            clearError('mainImage');
         }
     };
 
@@ -108,20 +140,30 @@ export default function AdminProductEdit() {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+
+        const validationErrors = validate();
+        if (Object.keys(validationErrors).length > 0) {
+            setErrors(validationErrors);
+            document.getElementById('form-errors-banner')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            return;
+        }
+
         setLoading(true);
         try {
             await handleUpdateProduct(productId, formData, mainImage, newCarouselImages, removedImages);
             navigate('/admin');
         } catch (error: any) {
-            let errorMessage = 'Erro ao atualizar produto.';
             if (error.response?.data?.errors) {
-                errorMessage = Object.values(error.response.data.errors).flat().join('\n');
-            } else if (error.response?.data?.message) {
-                errorMessage = error.response.data.message;
-            } else if (error.message) {
-                errorMessage = error.message;
+                const backendErrors: Record<string, string> = {};
+                Object.entries(error.response.data.errors).forEach(([field, messages]: [string, any]) => {
+                    backendErrors[field] = Array.isArray(messages) ? messages[0] : String(messages);
+                });
+                setErrors(backendErrors);
+                document.getElementById('form-errors-banner')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            } else {
+                const errorMessage = error.response?.data?.message || error.message || 'Erro ao atualizar produto.';
+                alert(errorMessage);
             }
-            alert(errorMessage);
         } finally {
             setLoading(false);
         }
@@ -152,7 +194,17 @@ export default function AdminProductEdit() {
                 </div>
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-10">
+            <form onSubmit={handleSubmit} noValidate className="space-y-10">
+                {Object.keys(errors).length > 0 && (
+                    <div id="form-errors-banner" className="flex items-start gap-4 bg-red-500/10 border border-red-500/20 text-red-600 rounded-2xl p-6">
+                        <AlertCircle size={22} className="flex-shrink-0 mt-0.5" />
+                        <div>
+                            <p className="font-black text-sm uppercase tracking-widest mb-1">Verifique os campos destacados</p>
+                            <p className="text-sm font-medium opacity-80">Corrija as informações abaixo antes de continuar.</p>
+                        </div>
+                    </div>
+                )}
+
                 <div className="bg-surface p-12 rounded-[2.5rem] shadow-2xl border border-border">
                     <div className="flex items-center gap-3 mb-8">
                         <div className="w-8 h-8 bg-brand-mel/10 text-brand-mel rounded-lg flex items-center justify-center">
@@ -164,23 +216,23 @@ export default function AdminProductEdit() {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
                         <div className="space-y-2">
                             <label className="block text-[10px] uppercase font-black text-text-secondary tracking-[0.15em] ml-1">Nome do Produto *</label>
-                            <input 
-                                type="text" 
-                                required 
-                                value={formData.name} 
-                                onChange={handleNameChange} 
-                                className="w-full px-5 py-4 bg-bg-main border border-border rounded-xl focus:outline-none focus:border-brand-mel focus:ring-4 focus:ring-brand-mel/10 transition-all font-medium text-sm text-text-primary" 
+                            <input
+                                type="text"
+                                value={formData.name}
+                                onChange={handleNameChange}
+                                className={inputClass('name', "w-full px-5 py-4 bg-bg-main border border-border rounded-xl focus:outline-none focus:border-brand-mel focus:ring-4 focus:ring-brand-mel/10 transition-all font-medium text-sm text-text-primary")}
                             />
+                            {errors.name && <p className="text-xs font-bold text-red-500 ml-1">{errors.name}</p>}
                         </div>
                         <div className="space-y-2">
                             <label className="block text-[10px] uppercase font-black text-text-secondary tracking-[0.15em] ml-1">URL amigável (Slug) *</label>
-                            <input 
-                                type="text" 
-                                required 
-                                value={formData.slug} 
-                                onChange={(e) => setFormData({...formData, slug: e.target.value})} 
-                                className="w-full px-5 py-4 bg-bg-main/50 border border-border rounded-xl focus:outline-none focus:border-brand-mel transition-all font-medium text-sm text-text-secondary italic" 
+                            <input
+                                type="text"
+                                value={formData.slug}
+                                onChange={(e) => updateField('slug', e.target.value)}
+                                className={inputClass('slug', "w-full px-5 py-4 bg-bg-main/50 border border-border rounded-xl focus:outline-none focus:border-brand-mel transition-all font-medium text-sm text-text-secondary italic")}
                             />
+                            {errors.slug && <p className="text-xs font-bold text-red-500 ml-1">{errors.slug}</p>}
                         </div>
                     </div>
 
@@ -190,11 +242,10 @@ export default function AdminProductEdit() {
                                 <LayoutGrid size={12} /> Categoria *
                             </label>
                             <div className="relative">
-                                <select 
-                                    required 
-                                    value={formData.category_id} 
-                                    onChange={(e) => setFormData({...formData, category_id: e.target.value})} 
-                                    className="w-full pl-6 pr-12 py-5 bg-bg-main border border-border rounded-2xl focus:outline-none focus:border-brand-mel focus:ring-8 focus:ring-brand-mel/5 transition-all font-bold text-sm text-text-primary appearance-none cursor-pointer"
+                                <select
+                                    value={formData.category_id}
+                                    onChange={(e) => updateField('category_id', e.target.value)}
+                                    className={inputClass('category_id', "w-full pl-6 pr-12 py-5 bg-bg-main border border-border rounded-2xl focus:outline-none focus:border-brand-mel focus:ring-8 focus:ring-brand-mel/5 transition-all font-bold text-sm text-text-primary appearance-none cursor-pointer")}
                                 >
                                     <option value="">Selecione...</option>
                                     {categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
@@ -203,36 +254,37 @@ export default function AdminProductEdit() {
                                     <svg className="w-4 h-4 fill-current" viewBox="0 0 20 20"><path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" /></svg>
                                 </div>
                             </div>
+                            {errors.category_id && <p className="text-xs font-bold text-red-500 ml-1">{errors.category_id}</p>}
                         </div>
                         <div className="space-y-2">
                             <label className="block text-[10px] uppercase font-black text-text-secondary tracking-[0.15em] ml-1 flex items-center gap-2">
                                 <DollarSign size={12} /> Preço (R$) *
                             </label>
-                            <input 
-                                type="number" 
-                                step="0.01" 
-                                required 
-                                value={formData.price} 
-                                onChange={(e) => setFormData({...formData, price: e.target.value})} 
+                            <input
+                                type="number"
+                                step="0.01"
+                                value={formData.price}
+                                onChange={(e) => updateField('price', e.target.value)}
                                 onBlur={(e) => {
                                     if (e.target.value) {
                                         setFormData({...formData, price: Number(e.target.value).toFixed(2)});
                                     }
                                 }}
-                                className="w-full px-5 py-4 bg-bg-main border border-border rounded-xl focus:outline-none focus:border-brand-mel transition-all font-medium text-sm text-text-primary" 
+                                className={inputClass('price', "w-full px-5 py-4 bg-bg-main border border-border rounded-xl focus:outline-none focus:border-brand-mel transition-all font-medium text-sm text-text-primary")}
                             />
+                            {errors.price && <p className="text-xs font-bold text-red-500 ml-1">{errors.price}</p>}
                         </div>
                         <div className="space-y-2">
                             <label className="block text-[10px] uppercase font-black text-text-secondary tracking-[0.15em] ml-1 flex items-center gap-2">
                                 <Database size={12} /> Estoque Atual *
                             </label>
-                            <input 
-                                type="number" 
-                                required 
-                                value={formData.stock} 
-                                onChange={(e) => setFormData({...formData, stock: e.target.value})} 
-                                className="w-full px-5 py-4 bg-bg-main border border-border rounded-xl focus:outline-none focus:border-brand-mel transition-all font-medium text-sm text-text-primary" 
+                            <input
+                                type="number"
+                                value={formData.stock}
+                                onChange={(e) => updateField('stock', e.target.value)}
+                                className={inputClass('stock', "w-full px-5 py-4 bg-bg-main border border-border rounded-xl focus:outline-none focus:border-brand-mel transition-all font-medium text-sm text-text-primary")}
                             />
+                            {errors.stock && <p className="text-xs font-bold text-red-500 ml-1">{errors.stock}</p>}
                         </div>
                     </div>
 
@@ -258,8 +310,8 @@ export default function AdminProductEdit() {
                     </div>
 
                     <div className="mb-10">
-                        <label className="block text-[10px] uppercase font-black text-text-secondary tracking-[0.15em] mb-4 ml-1">Imagem de Capa (Principal)</label>
-                        <div className="flex flex-col md:flex-row items-center gap-8 p-6 bg-bg-main/50 rounded-2xl border-2 border-dashed border-border group hover:border-brand-mel/50 transition-colors">
+                        <label className="block text-[10px] uppercase font-black text-text-secondary tracking-[0.15em] mb-4 ml-1">Imagem de Capa (Principal) *</label>
+                        <div className={`flex flex-col md:flex-row items-center gap-8 p-6 bg-bg-main/50 rounded-2xl border-2 border-dashed group hover:border-brand-mel/50 transition-colors ${errors.mainImage ? 'border-red-500' : 'border-border'}`}>
                             <div className="w-40 h-40 bg-bg-main rounded-xl flex items-center justify-center overflow-hidden shadow-inner border border-border group-hover:scale-105 transition-transform duration-500">
                                 {mainImagePreview ? <img src={mainImagePreview} className="w-full h-full object-contain p-2" /> : <ImageIcon className="text-text-secondary/20" size={48} />}
                             </div>
@@ -273,6 +325,7 @@ export default function AdminProductEdit() {
                                         <button type="button" onClick={removeMainImage} className="px-6 py-2.5 border border-red-500/20 text-red-500 text-[10px] font-black uppercase tracking-widest rounded-lg hover:bg-red-500 hover:text-white transition-all">Remover</button>
                                     )}
                                 </div>
+                                {errors.mainImage && <p className="text-xs font-bold text-red-500 mt-3">{errors.mainImage}</p>}
                             </div>
                         </div>
                     </div>

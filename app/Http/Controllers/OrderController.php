@@ -4,9 +4,13 @@ namespace App\Http\Controllers;
 
 use App\Base\Http\Controllers\BaseController;
 use App\Http\Requests\Order\StoreOrderRequest;
+use App\Mail\OrderStatusUpdated;
+use App\Mail\PaymentConfirmed;
+use App\Mail\PaymentConfirmedAdmin;
 use App\Services\Order\StoreOrderService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
 
 class OrderController extends BaseController
 {
@@ -103,8 +107,20 @@ class OrderController extends BaseController
     public function updateStatus(int $id, \Illuminate\Http\Request $request): JsonResponse
     {
         try {
-            $order = \App\Models\Order::findOrFail($id);
+            $order = \App\Models\Order::with(['items.product', 'user'])->findOrFail($id);
+
+            $previous_status = $order->status;
+            $previous_payment_status = $order->payment_status;
+
             $order->update($request->only(['status', 'payment_status', 'tracking_code']));
+
+            if ($order->payment_status === 'paid' && $previous_payment_status !== 'paid') {
+                Mail::to($order->user->email)->send(new PaymentConfirmed($order));
+                Mail::to(config('mail.admin_address'))->send(new PaymentConfirmedAdmin($order));
+            } elseif ($order->status !== $previous_status && $order->status !== 'paid') {
+                Mail::to($order->user->email)->send(new OrderStatusUpdated($order));
+            }
+
             return self::successResponse($order, 'Pedido atualizado com sucesso.');
         } catch (\Exception $e) {
             return self::returnError($e);

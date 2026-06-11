@@ -61,13 +61,7 @@ Route::middleware(['auth:sanctum', 'can:admin-access'])->group(function () {
     Route::get('/admin/settings/store-address', [App\Http\Controllers\SettingController::class, 'getStoreAddress']);
     Route::post('/admin/settings/store-address', [App\Http\Controllers\SettingController::class, 'updateStoreAddress']);
 
-    // Integração Melhor Envio
-    Route::get('/admin/integrations/melhor-envio', [App\Http\Controllers\Admin\IntegrationController::class, 'index']);
-    Route::get('/admin/integrations/melhor-envio/redirect-url', [App\Http\Controllers\Admin\IntegrationController::class, 'getRedirectUrl']);
 });
-
-// Callback público do Melhor Envio (não pode ter auth:sanctum pois é um redirect externo do browser)
-Route::get('/admin/integrations/melhor-envio/callback', [App\Http\Controllers\Admin\IntegrationController::class, 'callback']);
 
 // Rotas do Cliente (Autenticado)
 Route::middleware('auth:sanctum')->group(function () {

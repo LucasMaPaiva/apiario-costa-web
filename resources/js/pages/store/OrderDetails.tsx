@@ -78,23 +78,14 @@ export default function OrderDetails() {
                             </div>
 
                             {order.tracking_code && (
-                                <div className="bg-bg-main p-6 rounded-2xl border border-border flex items-center justify-between">
-                                    <div className="flex items-center gap-4">
-                                        <div className="w-10 h-10 bg-brand-mel/10 text-brand-mel rounded-xl flex items-center justify-center">
-                                            <Truck size={20} />
-                                        </div>
-                                        <div>
-                                            <p className="text-[10px] font-black text-text-secondary uppercase tracking-widest">Código de Rastreio</p>
-                                            <p className="text-sm font-bold text-text-primary">{order.tracking_code}</p>
-                                        </div>
+                                <div className="bg-bg-main p-6 rounded-2xl border border-border flex items-center gap-4">
+                                    <div className="w-10 h-10 bg-brand-mel/10 text-brand-mel rounded-xl flex items-center justify-center">
+                                        <Truck size={20} />
                                     </div>
-                                    <a 
-                                        href={`https://melhorenvio.com.br/rastreio/${order.tracking_code}`} 
-                                        target="_blank"
-                                        className="bg-brand-dark text-brand-mel px-6 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-brand-mel hover:text-white transition-all shadow-lg"
-                                    >
-                                        Rastrear no Melhor Envio
-                                    </a>
+                                    <div>
+                                        <p className="text-[10px] font-black text-text-secondary uppercase tracking-widest">Código de Rastreio</p>
+                                        <p className="text-sm font-bold text-text-primary">{order.tracking_code}</p>
+                                    </div>
                                 </div>
                             )}
                         </div>

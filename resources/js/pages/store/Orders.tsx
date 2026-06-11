@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { ShoppingBag, Package, Clock, ChevronRight, ExternalLink } from 'lucide-react';
+import { ShoppingBag, Package, Clock, ChevronRight } from 'lucide-react';
 import { fetchUserOrders } from '../../modules/orders/services/orderService';
 import { Link } from 'react-router-dom';
 import { motion } from 'motion/react';
@@ -139,19 +139,8 @@ export default function MyOrders() {
                                     </div>
                                 </div>
                                 
-                                <div className="bg-bg-main px-8 py-4 flex justify-between items-center border-t border-border">
-                                    <div className="flex items-center gap-2">
-                                        {order.tracking_code && (
-                                            <a 
-                                                href={`https://melhorenvio.com.br/rastreio/${order.tracking_code}`} 
-                                                target="_blank" 
-                                                className="flex items-center gap-2 text-[10px] font-black text-brand-wine hover:text-brand-mel uppercase tracking-widest transition-colors"
-                                            >
-                                                <ExternalLink size={14} /> Rastrear Entrega
-                                            </a>
-                                        )}
-                                    </div>
-                                    <Link 
+                                <div className="bg-bg-main px-8 py-4 flex justify-end items-center border-t border-border">
+                                    <Link
                                         to={`/meus-pedidos/${order.id}`}
                                         className="flex items-center gap-2 text-[10px] font-black text-text-secondary hover:text-brand-mel uppercase tracking-widest transition-colors"
                                     >

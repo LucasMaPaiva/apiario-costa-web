@@ -114,7 +114,7 @@ export default function AdminOrderDetails() {
                         </div>
 
                         <div className="mb-10">
-                            <label className="block text-[10px] font-black uppercase tracking-widest text-brand-mel mb-3">Código de Rastreio (Melhor Envio)</label>
+                            <label className="block text-[10px] font-black uppercase tracking-widest text-brand-mel mb-3">Código de Rastreio</label>
                             <div className="flex gap-4">
                                 <input 
                                     type="text"

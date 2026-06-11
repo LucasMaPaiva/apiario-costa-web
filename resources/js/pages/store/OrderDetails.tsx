@@ -139,15 +139,21 @@ export default function OrderDetails() {
                         {/* Address Card */}
                         <div className="bg-surface rounded-[2rem] border border-border p-10 shadow-sm">
                             <h2 className="text-xl font-black italic text-text-primary mb-6 tracking-tight flex items-center gap-3">
-                                <MapPin size={20} className="text-brand-mel" /> Entrega
+                                <MapPin size={20} className="text-brand-mel" /> {order.delivery_method === 'pickup' ? 'Retirada' : 'Entrega'}
                             </h2>
                             <div className="text-sm font-medium text-text-secondary leading-relaxed italic">
                                 <p className="font-bold text-text-primary not-italic uppercase text-[10px] tracking-widest mb-2">{order.shipping_method}</p>
-                                <p>{order.street}, {order.number}</p>
-                                {order.complement && <p>{order.complement}</p>}
-                                <p>{order.neighborhood}</p>
-                                <p>{order.city} - {order.state}</p>
-                                <p>CEP: {order.cep}</p>
+                                {order.delivery_method === 'pickup' ? (
+                                    <p>O pedido será retirado diretamente no Apiário Costa. Entraremos em contato para combinar o horário.</p>
+                                ) : (
+                                    <>
+                                        <p>{order.street}, {order.number}</p>
+                                        {order.complement && <p>{order.complement}</p>}
+                                        <p>{order.neighborhood}</p>
+                                        <p>{order.city} - {order.state}</p>
+                                        <p>CEP: {order.cep}</p>
+                                    </>
+                                )}
                             </div>
                         </div>
 

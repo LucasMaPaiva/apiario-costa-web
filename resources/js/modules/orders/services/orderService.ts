@@ -5,13 +5,14 @@ export interface OrderData {
         product_id: number;
         quantity: number;
     }>;
-    cep: string;
-    street: string;
-    number: string;
+    delivery_method: 'delivery' | 'pickup';
+    cep?: string;
+    street?: string;
+    number?: string;
     complement?: string;
-    neighborhood: string;
-    city: string;
-    state: string;
+    neighborhood?: string;
+    city?: string;
+    state?: string;
     shipping_method?: string;
     shipping_cost?: number;
 }
@@ -28,6 +29,11 @@ export const fetchUserOrders = async () => {
 
 export const calculateShipping = async (cep: string, items: any[]) => {
     const response = await httpClient.post('/api/shipping/calculate', { cep, items });
+    return response.data.data;
+};
+
+export const fetchStoreAddress = async () => {
+    const response = await httpClient.get('/api/store-address');
     return response.data.data;
 };
 

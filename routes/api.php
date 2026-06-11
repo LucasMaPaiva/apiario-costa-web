@@ -38,6 +38,7 @@ Route::get('/products', [ProductController::class, 'index']);
 Route::get('/products/{slug}', [ProductController::class, 'show']);
 Route::get('/categories', [CategoryController::class, 'index']);
 Route::post('/shipping/calculate', [ShippingController::class, 'calculate']);
+Route::get('/store-address', [App\Http\Controllers\SettingController::class, 'getStoreAddress']);
 
 // Administrativo
 Route::middleware(['auth:sanctum', 'can:admin-access'])->group(function () {

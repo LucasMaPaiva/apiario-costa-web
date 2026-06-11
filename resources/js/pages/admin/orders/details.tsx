@@ -184,15 +184,21 @@ export default function AdminOrderDetails() {
                     {/* Shipping Address */}
                     <div className="bg-surface rounded-[2.5rem] border border-border p-10 shadow-sm">
                         <h2 className="text-xl font-black italic text-text-primary mb-6 tracking-tight flex items-center gap-3">
-                            <MapPin size={20} className="text-brand-mel" /> Endereço de Entrega
+                            <MapPin size={20} className="text-brand-mel" /> {order.delivery_method === 'pickup' ? 'Retirada no Local' : 'Endereço de Entrega'}
                         </h2>
                         <div className="text-sm font-medium text-text-secondary leading-relaxed italic space-y-1">
                             <p className="font-bold text-text-primary not-italic uppercase text-[10px] tracking-widest mb-2 bg-brand-mel/10 inline-block px-3 py-1 rounded-lg">{order.shipping_method || 'Transportadora'}</p>
-                            <p>{order.street}, {order.number}</p>
-                            {order.complement && <p>{order.complement}</p>}
-                            <p>{order.neighborhood}</p>
-                            <p>{order.city} - {order.state}</p>
-                            <p className="font-bold text-text-primary not-italic mt-2">CEP: {order.cep}</p>
+                            {order.delivery_method === 'pickup' ? (
+                                <p>O cliente irá retirar o pedido diretamente no Apiário Costa.</p>
+                            ) : (
+                                <>
+                                    <p>{order.street}, {order.number}</p>
+                                    {order.complement && <p>{order.complement}</p>}
+                                    <p>{order.neighborhood}</p>
+                                    <p>{order.city} - {order.state}</p>
+                                    <p className="font-bold text-text-primary not-italic mt-2">CEP: {order.cep}</p>
+                                </>
+                            )}
                         </div>
                     </div>
                 </div>

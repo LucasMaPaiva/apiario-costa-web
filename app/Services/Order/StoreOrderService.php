@@ -37,21 +37,25 @@ class StoreOrderService
                 ];
             }
 
-            $shipping_cost = (float) ($data['shipping_cost'] ?? 0);
+            $delivery_method = $data['delivery_method'] ?? 'delivery';
+            $is_pickup = $delivery_method === 'pickup';
+
+            $shipping_cost = $is_pickup ? 0.0 : (float) ($data['shipping_cost'] ?? 0);
             $total_amount += $shipping_cost;
 
             $order = Order::create([
                 'user_id' => Auth::id(),
                 'total_amount' => $total_amount,
                 'status' => 'pending',
-                'cep' => $data['cep'],
-                'street' => $data['street'],
-                'number' => $data['number'],
-                'complement' => $data['complement'] ?? null,
-                'neighborhood' => $data['neighborhood'],
-                'city' => $data['city'],
-                'state' => $data['state'],
-                'shipping_method' => $data['shipping_method'] ?? null,
+                'delivery_method' => $delivery_method,
+                'cep' => $is_pickup ? null : $data['cep'],
+                'street' => $is_pickup ? null : $data['street'],
+                'number' => $is_pickup ? null : $data['number'],
+                'complement' => $is_pickup ? null : ($data['complement'] ?? null),
+                'neighborhood' => $is_pickup ? null : $data['neighborhood'],
+                'city' => $is_pickup ? null : $data['city'],
+                'state' => $is_pickup ? null : $data['state'],
+                'shipping_method' => $is_pickup ? 'Retirada no Local' : ($data['shipping_method'] ?? null),
                 'shipping_cost' => $shipping_cost,
                 'payment_status' => 'pending',
             ]);

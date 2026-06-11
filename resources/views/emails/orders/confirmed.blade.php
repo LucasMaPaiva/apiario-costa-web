@@ -65,6 +65,12 @@
             </tbody>
         </table>
 
+        @if($order->delivery_method === 'pickup')
+        <p><strong>Retirada no local:</strong></p>
+        <div class="address-box">
+            O pedido será retirado diretamente no Apiário Costa. Em breve entraremos em contato para combinar o melhor horário.
+        </div>
+        @else
         <p><strong>Endereço de entrega:</strong></p>
         <div class="address-box">
             {{ $order->street }}, {{ $order->number }}
@@ -72,6 +78,7 @@
             {{ $order->neighborhood }} — {{ $order->city }}/{{ $order->state }}<br>
             CEP: {{ $order->cep }}
         </div>
+        @endif
 
         <p>Status do pedido: <span class="badge">Aguardando pagamento</span></p>
         <p style="color:#6b7280; font-size:13px;">Qualquer dúvida, responda este email ou entre em contato conosco.</p>

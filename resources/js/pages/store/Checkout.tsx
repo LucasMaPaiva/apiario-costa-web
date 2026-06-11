@@ -2,10 +2,11 @@ import React, { useState, useEffect } from 'react';
 import httpClient from '../../common/services/httpClient';
 import { useCart } from '../../modules/cart/context/CartContext';
 import { createOrder, createPaymentPreference, OrderData } from '../../modules/orders/services/orderService';
-import { ShoppingBag, ArrowLeft, CheckCircle2, Loader2, MapPin, Truck, CreditCard } from 'lucide-react';
+import { ShoppingBag, ArrowLeft, CheckCircle2, Loader2, MapPin, Truck, CreditCard, Store } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'motion/react';
 import { formatBRL } from '../../common/utils/formatBRL';
+import { fetchStoreAddress } from '../../modules/orders/services/orderService';
 
 export default function Checkout() {
     const { cart, cart_total, clearCart } = useCart();
@@ -16,6 +17,8 @@ export default function Checkout() {
     const [error, setError] = useState('');
     const [shipping_options, set_shipping_options] = useState<any[]>([]);
     const [selected_shipping, set_selected_shipping] = useState<any>(null);
+    const [delivery_method, set_delivery_method] = useState<'delivery' | 'pickup'>('delivery');
+    const [store_address, set_store_address] = useState<any>(null);
 
     const [address, setAddress] = useState({
         cep: '',
@@ -60,6 +63,7 @@ export default function Checkout() {
 
     useEffect(() => {
         loadSavedAddresses();
+        fetchStoreAddress().then(set_store_address).catch(() => set_store_address(null));
     }, []);
 
     const handleCalculateShipping = async (cep: string) => {
@@ -79,6 +83,15 @@ export default function Checkout() {
             set_shipping_options([]);
         } finally {
             set_calculating_shipping(false);
+        }
+    };
+
+    const handleDeliveryMethodChange = (method: 'delivery' | 'pickup') => {
+        set_delivery_method(method);
+        if (method === 'pickup') {
+            set_selected_shipping({ id: 'pickup', name: 'Retirada no Local', price: 0, delivery_time: 0 });
+        } else {
+            set_selected_shipping(shipping_options.length > 0 ? shipping_options[0] : null);
         }
     };
 
@@ -114,11 +127,11 @@ export default function Checkout() {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (cart.length === 0) return;
-        if (!selected_shipping) {
+        if (delivery_method === 'delivery' && !selected_shipping) {
             setError('Por favor, selecione uma modalidade de frete.');
             return;
         }
-        
+
         setLoading(true);
         setError('');
 
@@ -127,9 +140,10 @@ export default function Checkout() {
                 product_id: item.id,
                 quantity: item.quantity
             })),
-            ...address,
-            shipping_method: selected_shipping.name,
-            shipping_cost: selected_shipping.price
+            delivery_method,
+            ...(delivery_method === 'delivery' ? address : {}),
+            shipping_method: selected_shipping?.name,
+            shipping_cost: selected_shipping?.price ?? 0
         };
 
         try {
@@ -187,6 +201,80 @@ export default function Checkout() {
                     {/* Formulário */}
                     <div className="lg:col-span-7">
                         <form id="checkout-form" onSubmit={handleSubmit} className="space-y-8">
+                            <section className="bg-surface p-8 rounded-3xl shadow-sm border border-border">
+                                <div className="flex items-center gap-3 mb-8">
+                                    <div className="w-10 h-10 bg-bg-main rounded-xl flex items-center justify-center text-brand-mel">
+                                        <Truck size={20} />
+                                    </div>
+                                    <h2 className="text-xl font-black italic text-text-primary tracking-tight">Como você quer receber?</h2>
+                                </div>
+
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    <div
+                                        onClick={() => handleDeliveryMethodChange('delivery')}
+                                        className={`p-5 rounded-2xl border-2 transition-all cursor-pointer flex items-center gap-4 ${
+                                            delivery_method === 'delivery'
+                                                ? 'border-brand-mel bg-brand-mel/5'
+                                                : 'border-border hover:border-brand-mel/30'
+                                        }`}
+                                    >
+                                        <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${delivery_method === 'delivery' ? 'bg-brand-mel text-brand-white' : 'bg-bg-main text-text-secondary'}`}>
+                                            <Truck size={18} />
+                                        </div>
+                                        <div>
+                                            <p className="text-sm font-black text-text-primary">Entrega</p>
+                                            <p className="text-[10px] text-text-secondary font-bold uppercase tracking-widest">Receba no endereço</p>
+                                        </div>
+                                    </div>
+                                    <div
+                                        onClick={() => handleDeliveryMethodChange('pickup')}
+                                        className={`p-5 rounded-2xl border-2 transition-all cursor-pointer flex items-center gap-4 ${
+                                            delivery_method === 'pickup'
+                                                ? 'border-brand-mel bg-brand-mel/5'
+                                                : 'border-border hover:border-brand-mel/30'
+                                        }`}
+                                    >
+                                        <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${delivery_method === 'pickup' ? 'bg-brand-mel text-brand-white' : 'bg-bg-main text-text-secondary'}`}>
+                                            <Store size={18} />
+                                        </div>
+                                        <div>
+                                            <p className="text-sm font-black text-text-primary">Retirar no Local</p>
+                                            <p className="text-[10px] text-text-secondary font-bold uppercase tracking-widest">Sem custo de frete</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </section>
+
+                            {delivery_method === 'pickup' ? (
+                                <section className="bg-surface p-8 rounded-3xl shadow-sm border border-border">
+                                    <div className="flex items-center gap-3 mb-6">
+                                        <div className="w-10 h-10 bg-bg-main rounded-xl flex items-center justify-center text-brand-mel">
+                                            <Store size={20} />
+                                        </div>
+                                        <h2 className="text-xl font-black italic text-text-primary tracking-tight">Retirada no Local</h2>
+                                    </div>
+                                    {store_address ? (
+                                        <div className="p-6 bg-bg-main rounded-2xl border border-border">
+                                            <p className="text-sm font-bold text-text-primary">
+                                                {store_address.street}, {store_address.number}
+                                                {store_address.complement && ` - ${store_address.complement}`}
+                                            </p>
+                                            <p className="text-xs text-text-secondary italic mt-1">
+                                                {store_address.neighborhood} • {store_address.city} - {store_address.state}
+                                            </p>
+                                            <p className="text-xs text-text-secondary italic mt-1">CEP: {store_address.cep}</p>
+                                            <p className="text-[10px] text-text-secondary italic mt-4 leading-relaxed">
+                                                Assim que o pagamento for confirmado, entraremos em contato para combinar o melhor horário de retirada.
+                                            </p>
+                                        </div>
+                                    ) : (
+                                        <p className="text-xs text-text-secondary italic">
+                                            Assim que o pagamento for confirmado, entraremos em contato para combinar o melhor horário de retirada.
+                                        </p>
+                                    )}
+                                </section>
+                            ) : (
+                            <>
                             <section className="bg-surface p-8 rounded-3xl shadow-sm border border-border">
                                 <div className="flex items-center gap-3 mb-8">
                                     <div className="w-10 h-10 bg-bg-main rounded-xl flex items-center justify-center text-brand-mel">
@@ -359,6 +447,8 @@ export default function Checkout() {
                                     </div>
                                 )}
                             </section>
+                            </>
+                            )}
 
                             <section className="bg-surface p-8 rounded-3xl shadow-sm border border-border">
                                 <div className="flex items-center gap-3 mb-6">
@@ -406,7 +496,11 @@ export default function Checkout() {
                                     </div>
                                     <div className="flex justify-between text-xs opacity-60 uppercase tracking-widest font-bold">
                                         <span>Frete</span>
-                                        <span>{selected_shipping ? formatBRL(selected_shipping.price) : 'A calcular'}</span>
+                                        <span>
+                                            {delivery_method === 'pickup'
+                                                ? 'Grátis'
+                                                : selected_shipping ? formatBRL(selected_shipping.price) : 'A calcular'}
+                                        </span>
                                     </div>
                                     <div className="flex justify-between items-end pt-4">
                                         <span className="text-[10px] uppercase tracking-[0.3em] font-black text-brand-mel">Total</span>

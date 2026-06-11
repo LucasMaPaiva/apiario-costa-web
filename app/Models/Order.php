@@ -12,6 +12,7 @@ class Order extends Model
         'user_id',
         'total_amount',
         'status',
+        'delivery_method',
         'cep',
         'street',
         'number',

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Navigate, Outlet, Link, useLocation } from 'react-router-dom';
-import { LogOut, Package, ListTree, ShoppingBag, Sun, Moon, Truck } from 'lucide-react';
+import { LogOut, Package, ListTree, ShoppingBag, Sun, Moon, Truck, Home } from 'lucide-react';
 import { logoutService } from '../modules/auth/services/authService';
 import { useTheme } from '../common/context/ThemeContext';
 
@@ -32,14 +32,14 @@ export default function AdminLayout() {
         <div className="h-screen bg-bg-main p-4 flex gap-4 transition-colors duration-500 overflow-hidden">
             {/* Sidebar Card */}
             <aside className="w-72 bg-sidebar-bg rounded-[2rem] flex flex-col shadow-2xl border border-sidebar-border overflow-hidden transition-all duration-300">
-                <div className="p-8 text-center border-b border-sidebar-border bg-white/[0.02]">
+                <Link to="/" className="block p-8 text-center border-b border-sidebar-border bg-white/[0.02] hover:bg-brand-mel/5 transition-colors group">
                     <div className="relative inline-block mb-4">
                         <div className="absolute -inset-2 bg-brand-mel/20 blur-xl rounded-full animate-pulse" />
-                        <img src="/logo.jpg" alt="Logo" className="h-16 w-16 mx-auto rounded-2xl relative z-10 brightness-110" />
+                        <img src="/logo.jpg" alt="Logo" className="h-16 w-16 mx-auto rounded-2xl relative z-10 brightness-110 group-hover:scale-105 transition-transform" />
                     </div>
                     <h2 className="text-sm font-black uppercase tracking-[0.3em] text-text-primary">Apiário Costa</h2>
                     <p className="text-[10px] text-brand-mel mt-1 uppercase font-black tracking-widest">Premium Honey</p>
-                </div>
+                </Link>
 
                 <nav className="flex-1 p-6 space-y-3 overflow-y-auto custom-scrollbar">
                     <Link
@@ -94,6 +94,14 @@ export default function AdminLayout() {
                 </nav>
 
                 <div className="p-6 space-y-3 bg-white/[0.02] border-t border-sidebar-border">
+                    <Link
+                        to="/"
+                        className="flex items-center gap-4 px-5 py-4 rounded-2xl text-sm font-bold text-sidebar-text hover:bg-brand-mel/10 hover:text-brand-mel transition-all duration-300 group"
+                    >
+                        <Home size={20} className="group-hover:scale-110 transition-transform" />
+                        Voltar ao Site
+                    </Link>
+
                     <button
                         onClick={toggleTheme}
                         className="w-full flex items-center justify-between px-5 py-4 rounded-2xl text-sm font-bold text-sidebar-text hover:bg-brand-mel/10 hover:text-brand-mel transition-all duration-300 group"

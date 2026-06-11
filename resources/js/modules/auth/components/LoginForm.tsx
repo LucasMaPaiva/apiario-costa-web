@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion } from 'motion/react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { loginService } from '../services/authService';
 
 export default function LoginForm() {
@@ -8,30 +8,26 @@ export default function LoginForm() {
     const [password, setPassword] = useState('');
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
+    const location = useLocation();
+    const from: string = (location.state as any)?.from || '/loja';
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        console.log('Form submission started');
         setLoading(true);
         setError('');
 
         try {
-            console.log('Fetching CSRF cookie...');
             const response = await loginService({ email, password });
-            console.log('Login successful, response:', response);
-            
             localStorage.setItem('auth_token', response.data.access_token);
-            
-            // Check if user is admin based on the login response
+
             const isAdmin = response.data.user.roles?.some((r: any) => r.name === 'admin') || false;
-            
+
             if (isAdmin) {
                 window.location.assign('/admin');
             } else {
-                window.location.assign('/loja');
+                window.location.assign(from);
             }
         } catch (err: any) {
-            console.error('Submission error:', err);
             setError(err.response?.data?.message || 'Erro de conexão ou servidor.');
         } finally {
             setLoading(false);

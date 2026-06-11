@@ -41,7 +41,7 @@ export default function About() {
             </h2>
             <div className="space-y-6 text-text-secondary text-lg leading-relaxed font-medium">
               <p>
-                A Apiário Costa nasceu do desejo de levar o verdadeiro sabor do mel artesanal para as famílias, mantendo viva a essência da natureza em cada colheita.
+                A Apiário Costa nasceu do desejo de levar o verdadeiro sabor do mel puro e natural para as famílias, mantendo viva a essência da natureza em cada colheita.
               </p>
               <p>
                 Acreditamos que o mel não é apenas um alimento, mas um presente da terra que merece ser tratado com o máximo respeito e sofisticação.
@@ -55,7 +55,7 @@ export default function About() {
               </div>
               <div>
                 <span className="block text-4xl sm:text-5xl font-serif text-brand-mel font-bold mb-1 italic text-glow">+Qualidade</span>
-                <span className="text-[10px] uppercase tracking-widest text-text-secondary font-bold">Artesanalismo</span>
+                <span className="text-[10px] uppercase tracking-widest text-text-secondary font-bold">Especialidade</span>
               </div>
             </div>
           </motion.div>

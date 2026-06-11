@@ -54,7 +54,7 @@ export default function Footer() {
         <div className="pt-8 border-t border-gray-50 flex flex-col md:flex-row justify-between items-center text-[10px] text-gray-400 uppercase tracking-widest font-medium">
           <p>© {currentYear} Apiário Costa - Todos os direitos reservados.</p>
           <div className="mt-4 md:mt-0 flex items-center space-x-4">
-            <span className="text-brand-mel font-bold uppercase tracking-normal normal-case">Artesanal / Puro / Real</span>
+            <span className="text-brand-mel font-bold uppercase tracking-normal normal-case">Premium / Puro / Real</span>
           </div>
         </div>
       </div>

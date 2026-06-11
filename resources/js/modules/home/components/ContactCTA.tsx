@@ -17,7 +17,7 @@ export default function ContactCTA() {
           transition={{ duration: 0.6 }}
         >
           <h2 className="text-4xl md:text-6xl font-bold italic text-brand-white mb-8 leading-tight">
-            Pronto para sentir o sabor verdadeiro do mel artesanal?
+            Pronto para sentir o sabor verdadeiro do mel puro?
           </h2>
           <p className="text-brand-white/80 text-xl mb-12 font-medium max-w-2xl mx-auto">
             Faça seu pedido diretamente pelo WhatsApp e receba em casa um produto premium com toda a dedicação da Apiário Costa.

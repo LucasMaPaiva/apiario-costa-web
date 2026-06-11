@@ -32,7 +32,7 @@ export default function VisualShowcase() {
             <span className="text-brand-wine uppercase tracking-[0.3em] text-xs font-bold mb-4 block">Essência em Detalhes</span>
             <h2 className="text-4xl md:text-5xl font-bold italic mb-4">Expressão Visual</h2>
             <p className="text-brand-dark/50 font-medium">
-              Valorizamos a apresentação tanto quanto o sabor. Nossa identidade reflete o cuidado da produção artesanal.
+              Valorizamos a apresentação tanto quanto o sabor. Nossa identidade reflete o cuidado e a precisão de cada produção.
             </p>
           </motion.div>
         </div>

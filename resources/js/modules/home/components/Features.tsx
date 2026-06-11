@@ -5,7 +5,7 @@ export default function Features() {
   const features = [
     {
       icon: <Sparkles className="w-6 h-6" />,
-      title: "Produto Artesanal",
+      title: "Produção Própria",
       desc: "Produção em pequena escala com máximo aproveitamento nutritivo."
     },
     {
@@ -38,7 +38,7 @@ export default function Features() {
             <div className="relative">
               <img
                 src="/honey-5.jpg"
-                alt="Mel puro e artesanal Apiário Costa"
+                alt="Mel puro Apiário Costa"
                 className="rounded-2xl shadow-2xl relative z-10"
               />
               <div className="absolute top-0 right-0 w-60 h-60 opacity-5 honeycomb-pattern pointer-events-none -mr-32 -mt-10"></div>

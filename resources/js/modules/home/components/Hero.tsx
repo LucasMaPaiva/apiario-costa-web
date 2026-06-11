@@ -15,10 +15,10 @@ export default function Hero() {
           className="relative z-10"
         >
           <span className="text-sm uppercase tracking-[0.3em] text-brand-wine font-semibold mb-6 block">
-            Artesanal & Puro
+            Puro & Natural
           </span>
           <h1 className="text-5xl md:text-6xl font-bold leading-tight mb-8 italic text-text-primary">
-            Mel artesanal com qualidade, cuidado e sabor de origem.
+            Mel puro com qualidade, cuidado e sabor de origem.
           </h1>
           <p className="text-text-secondary text-lg mb-12 max-w-md font-medium">
             Oferecemos mel com identidade autoral, cuidado rigoroso na produção e uma apresentação sofisticada para os paladares mais exigentes.

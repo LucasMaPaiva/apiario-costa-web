@@ -1,5 +1,5 @@
 import React from 'react';
-import { Navigate, Outlet } from 'react-router-dom';
+import { Navigate, Outlet, useLocation } from 'react-router-dom';
 import { useAuth } from '../../modules/auth/context/AuthContext';
 
 interface ProtectedRouteProps {
@@ -12,6 +12,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
     redirectPath = '/login' 
 }) => {
     const { user, loading } = useAuth();
+    const location = useLocation();
 
     if (loading) {
         return (
@@ -22,7 +23,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
     }
 
     if (!user) {
-        return <Navigate to={redirectPath} replace />;
+        return <Navigate to={redirectPath} state={{ from: location.pathname }} replace />;
     }
 
     // Role check (if applicable)

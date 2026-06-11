@@ -46,9 +46,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const logout = async () => {
         try {
             await logoutService();
+        } catch {
+            // ignora erros de rede — limpa localmente mesmo assim
+        } finally {
+            localStorage.removeItem('auth_token');
             setUser(null);
-        } catch (error) {
-            console.error('Logout failed:', error);
+            window.location.href = '/';
         }
     };
 

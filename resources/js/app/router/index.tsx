@@ -41,12 +41,12 @@ const router = createBrowserRouter([
                 element: <ProductDetails />
             },
             {
-                path: 'checkout',
-                element: <Checkout />
-            },
-            {
                 element: <ProtectedRoute />,
                 children: [
+                    {
+                        path: 'checkout',
+                        element: <Checkout />
+                    },
                     {
                         path: 'meus-pedidos',
                         element: <MyOrders />

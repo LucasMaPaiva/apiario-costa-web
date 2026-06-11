@@ -35,13 +35,13 @@ export const adaptProduct = (data: any): Product => {
         description: data.description,
         price: data.price,
         stock: data.stock,
-        imagePath: data.image_path,
+        imagePath: data.image_url,
         isActive: data.is_active,
         categoryId: data.category_id,
         category: data.category ? adaptCategory(data.category) : undefined,
         images: data.images?.map((img: any) => ({
             id: img.id,
-            path: img.path,
+            path: img.image_url,
             isMain: img.is_main,
             order: img.order
         })),

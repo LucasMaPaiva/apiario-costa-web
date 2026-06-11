@@ -11,6 +11,17 @@ class UpdateProductRequest extends FormRequest
         return true;
     }
 
+    protected function prepareForValidation(): void
+    {
+        // Campos de logística não são mais preenchidos pelo formulário; descarta
+        // valores inválidos (ex: "NaN") para não quebrar a validação.
+        foreach (['weight', 'width', 'height', 'length'] as $field) {
+            if ($this->has($field) && !is_numeric($this->input($field))) {
+                $this->request->remove($field);
+            }
+        }
+    }
+
     public function rules(): array
     {
         $productId = $this->route('id');
@@ -23,10 +34,10 @@ class UpdateProductRequest extends FormRequest
             'price' => 'required|numeric|min:0',
             'stock' => 'required|integer|min:0',
             'is_active' => 'boolean',
-            'weight' => 'required|numeric|min:0.001',
-            'width' => 'required|integer|min:1',
-            'height' => 'required|integer|min:1',
-            'length' => 'required|integer|min:1',
+            'weight' => 'nullable|numeric|min:0',
+            'width' => 'nullable|integer|min:0',
+            'height' => 'nullable|integer|min:0',
+            'length' => 'nullable|integer|min:0',
             'main_image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
             'carousel_images' => 'nullable|array',
             'carousel_images.*' => 'image|mimes:jpeg,png,jpg,webp|max:2048',
@@ -45,10 +56,6 @@ class UpdateProductRequest extends FormRequest
             'category_id.exists' => 'A categoria selecionada não é válida.',
             'price.required' => 'O preço é obrigatório.',
             'stock.required' => 'O estoque é obrigatório.',
-            'weight.required' => 'O peso é obrigatório.',
-            'width.required' => 'A largura é obrigatória.',
-            'height.required' => 'A altura é obrigatória.',
-            'length.required' => 'O comprimento é obrigatório.',
         ];
     }
 }

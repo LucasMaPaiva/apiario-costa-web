@@ -24,11 +24,7 @@ export default function AdminProductEdit() {
         stock: '0',
         category_id: '',
         is_active: true,
-        remove_main_image: false,
-        weight: '0',
-        width: '0',
-        height: '0',
-        length: '0'
+        remove_main_image: false
     });
     
     const [mainImage, setMainImage] = useState<File | null>(null);
@@ -82,11 +78,7 @@ export default function AdminProductEdit() {
                     stock: prod.stock.toString(),
                     category_id: prod.categoryId.toString(),
                     is_active: prod.isActive,
-                    remove_main_image: false,
-                    weight: prod.weight.toString(),
-                    width: prod.width.toString(),
-                    height: prod.height.toString(),
-                    length: prod.length.toString()
+                    remove_main_image: false
                 });
 
                 if (prod.imagePath) setMainImagePreview(prod.imagePath);

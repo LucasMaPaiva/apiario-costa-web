@@ -17,11 +17,7 @@ export default function AdminProductCreate() {
         price: '',
         stock: '0',
         category_id: '',
-        is_active: true,
-        weight: '1',
-        width: '10',
-        height: '10',
-        length: '10'
+        is_active: true
     });
     
     const [mainImage, setMainImage] = useState<File | null>(null);

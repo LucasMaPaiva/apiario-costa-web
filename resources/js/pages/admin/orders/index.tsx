@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useAdminOrders } from '../../../modules/admin/hooks/useAdminOrders';
-import { ShoppingBag, User, Calendar, MapPin, Eye, ExternalLink } from 'lucide-react';
+import { ShoppingBag, User, Calendar, MapPin, Eye, ExternalLink, Truck, Store } from 'lucide-react';
 import { formatBRL } from '../../../common/utils/formatBRL';
 
 const status_colors: any = {
@@ -41,6 +41,7 @@ export default function AdminOrdersList() {
                             <tr className="bg-white/[0.02] border-b border-border">
                                 <th className="px-8 py-6 text-[10px] font-black uppercase tracking-widest text-text-secondary">ID / Data</th>
                                 <th className="px-8 py-6 text-[10px] font-black uppercase tracking-widest text-text-secondary">Cliente</th>
+                                <th className="px-8 py-6 text-[10px] font-black uppercase tracking-widest text-text-secondary">Recebimento</th>
                                 <th className="px-8 py-6 text-[10px] font-black uppercase tracking-widest text-text-secondary">Total</th>
                                 <th className="px-8 py-6 text-[10px] font-black uppercase tracking-widest text-text-secondary">Status</th>
                                 <th className="px-8 py-6 text-[10px] font-black uppercase tracking-widest text-text-secondary">Ações</th>
@@ -65,10 +66,23 @@ export default function AdminOrdersList() {
                                     <td className="px-8 py-6">
                                         <div className="flex flex-col">
                                             <span className="text-sm font-bold text-text-primary">{order.user?.name}</span>
-                                            <span className="text-[10px] text-text-secondary flex items-center gap-1">
-                                                <MapPin size={10} /> {order.city} - {order.state}
-                                            </span>
+                                            {order.delivery_method !== 'pickup' && (
+                                                <span className="text-[10px] text-text-secondary flex items-center gap-1">
+                                                    <MapPin size={10} /> {order.city} - {order.state}
+                                                </span>
+                                            )}
                                         </div>
+                                    </td>
+                                    <td className="px-8 py-6">
+                                        {order.delivery_method === 'pickup' ? (
+                                            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border bg-brand-mel/10 text-brand-mel border-brand-mel/20">
+                                                <Store size={12} /> Retirada
+                                            </span>
+                                        ) : (
+                                            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border bg-blue-500/10 text-blue-500 border-blue-500/20">
+                                                <Truck size={12} /> Entrega
+                                            </span>
+                                        )}
                                     </td>
                                     <td className="px-8 py-6">
                                         <span className="text-sm font-black text-brand-mel">

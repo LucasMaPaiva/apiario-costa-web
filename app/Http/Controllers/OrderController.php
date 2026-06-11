@@ -109,6 +109,10 @@ class OrderController extends BaseController
         try {
             $order = \App\Models\Order::with(['items.product', 'user'])->findOrFail($id);
 
+            if ($order->status === 'delivered') {
+                throw new \Symfony\Component\HttpKernel\Exception\ConflictHttpException('Pedido já entregue. Não é possível alterar o status.');
+            }
+
             $previous_status = $order->status;
             $previous_payment_status = $order->payment_status;
 

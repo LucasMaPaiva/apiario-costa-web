@@ -39,9 +39,9 @@ export default function AdminOrderDetails() {
             });
             await loadOrder();
             alert('Pedido atualizado com sucesso!');
-        } catch (error) {
+        } catch (error: any) {
             console.error('Failed to update order:', error);
-            alert('Erro ao atualizar pedido.');
+            alert(error?.response?.data?.message || 'Erro ao atualizar pedido.');
         } finally {
             setSaving(false);
         }
@@ -60,6 +60,8 @@ export default function AdminOrderDetails() {
     }
 
     if (!order) return <div className="p-20 text-center">Pedido não encontrado.</div>;
+
+    const isDelivered = order.status === 'delivered';
 
     return (
         <div className="max-w-6xl mx-auto pb-20">
@@ -83,13 +85,21 @@ export default function AdminOrderDetails() {
                             </div>
                         </div>
 
+                        {isDelivered && (
+                            <div className="mb-10 flex items-center gap-3 bg-purple-500/10 border border-purple-500/20 text-purple-700 rounded-2xl px-6 py-4 text-sm font-bold">
+                                <CheckCircle2 size={18} />
+                                Pedido entregue. Esta é a etapa final e o status não pode mais ser alterado.
+                            </div>
+                        )}
+
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-10">
                             <div>
                                 <label className="block text-[10px] font-black uppercase tracking-widest text-brand-mel mb-3">Status do Pedido</label>
-                                <select 
+                                <select
                                     value={status}
                                     onChange={(e) => setStatus(e.target.value)}
-                                    className="w-full bg-bg-main border border-border rounded-xl px-4 py-3 text-sm font-bold text-text-primary focus:outline-none focus:border-brand-mel"
+                                    disabled={isDelivered}
+                                    className="w-full bg-bg-main border border-border rounded-xl px-4 py-3 text-sm font-bold text-text-primary focus:outline-none focus:border-brand-mel disabled:opacity-50 disabled:cursor-not-allowed"
                                 >
                                     <option value="pending">Pendente</option>
                                     <option value="paid">Pago (Aguardando Envio)</option>
@@ -102,10 +112,11 @@ export default function AdminOrderDetails() {
                             </div>
                             <div>
                                 <label className="block text-[10px] font-black uppercase tracking-widest text-brand-mel mb-3">Status do Pagamento</label>
-                                <select 
+                                <select
                                     value={payment_status}
                                     onChange={(e) => setPaymentStatus(e.target.value)}
-                                    className="w-full bg-bg-main border border-border rounded-xl px-4 py-3 text-sm font-bold text-text-primary focus:outline-none focus:border-brand-mel"
+                                    disabled={isDelivered}
+                                    className="w-full bg-bg-main border border-border rounded-xl px-4 py-3 text-sm font-bold text-text-primary focus:outline-none focus:border-brand-mel disabled:opacity-50 disabled:cursor-not-allowed"
                                 >
                                     <option value="pending">Pendente</option>
                                     <option value="paid">Pago</option>
@@ -118,16 +129,17 @@ export default function AdminOrderDetails() {
                         <div className="mb-10">
                             <label className="block text-[10px] font-black uppercase tracking-widest text-brand-mel mb-3">Código de Rastreio</label>
                             <div className="flex gap-4">
-                                <input 
+                                <input
                                     type="text"
                                     value={tracking_code}
                                     onChange={(e) => setTrackingCode(e.target.value)}
                                     placeholder="Ex: BR123456789"
-                                    className="flex-1 bg-bg-main border border-border rounded-xl px-4 py-3 text-sm font-bold text-text-primary focus:outline-none focus:border-brand-mel"
+                                    disabled={isDelivered}
+                                    className="flex-1 bg-bg-main border border-border rounded-xl px-4 py-3 text-sm font-bold text-text-primary focus:outline-none focus:border-brand-mel disabled:opacity-50 disabled:cursor-not-allowed"
                                 />
-                                <button 
+                                <button
                                     onClick={handleSave}
-                                    disabled={saving}
+                                    disabled={saving || isDelivered}
                                     className="bg-brand-mel text-white px-8 py-3 rounded-xl text-xs font-black uppercase tracking-widest hover:bg-brand-gold transition-all shadow-lg flex items-center gap-2 disabled:opacity-50"
                                 >
                                     {saving ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}

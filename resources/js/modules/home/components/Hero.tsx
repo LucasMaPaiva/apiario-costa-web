@@ -50,7 +50,7 @@ export default function Hero() {
           className="w-full aspect-square rounded-2xl shadow-2xl overflow-hidden relative"
         >
           <img
-            src="/honey-4.jpg"
+            src="/hero-image.jpg"
             alt="Mel puro Apiário Costa"
             className="w-full h-full object-cover"
           />

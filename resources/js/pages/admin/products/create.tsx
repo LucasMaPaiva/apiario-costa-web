@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAdminProducts } from '../../../modules/admin/hooks/useAdminProducts';
 import { useAdminCategories } from '../../../modules/admin/hooks/useAdminCategories';
-import { Save, ArrowLeft, Image as ImageIcon, Plus, Info, LayoutGrid, DollarSign, Database, FileText, ShoppingBag } from 'lucide-react';
+import { Save, ArrowLeft, Image as ImageIcon, Plus, Info, LayoutGrid, DollarSign, Database, FileText } from 'lucide-react';
 
 export default function AdminProductCreate() {
     const navigate = useNavigate();
@@ -18,10 +18,10 @@ export default function AdminProductCreate() {
         stock: '0',
         category_id: '',
         is_active: true,
-        weight: '0',
-        width: '0',
-        height: '0',
-        length: '0'
+        weight: '1',
+        width: '10',
+        height: '10',
+        length: '10'
     });
     
     const [mainImage, setMainImage] = useState<File | null>(null);
@@ -197,63 +197,6 @@ export default function AdminProductCreate() {
                             className="w-full px-5 py-4 bg-bg-main border border-border rounded-xl focus:outline-none focus:border-brand-mel transition-all font-medium text-sm text-text-primary resize-none"
                             placeholder="Descreva as características e benefícios do produto..."
                         ></textarea>
-                    </div>
-                </div>
-
-                <div className="bg-surface p-12 rounded-[2.5rem] shadow-2xl border border-border">
-                    <div className="flex items-center gap-3 mb-8">
-                        <div className="w-8 h-8 bg-brand-mel/10 text-brand-mel rounded-lg flex items-center justify-center">
-                            <ShoppingBag size={18} />
-                        </div>
-                        <h2 className="text-sm font-black uppercase tracking-[0.2em] text-brand-mel">Logística (Medidas para Frete)</h2>
-                    </div>
-
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-                        <div className="space-y-2">
-                            <label className="block text-[10px] uppercase font-black text-text-secondary tracking-[0.15em] ml-1">Peso (kg) *</label>
-                            <input 
-                                type="number" 
-                                step="0.001"
-                                required 
-                                value={formData.weight} 
-                                onChange={(e) => setFormData({...formData, weight: e.target.value})} 
-                                className="w-full px-5 py-4 bg-bg-main border border-border rounded-xl focus:outline-none focus:border-brand-mel transition-all font-medium text-sm text-text-primary" 
-                                placeholder="0.500"
-                            />
-                        </div>
-                        <div className="space-y-2">
-                            <label className="block text-[10px] uppercase font-black text-text-secondary tracking-[0.15em] ml-1">Largura (cm) *</label>
-                            <input 
-                                type="number" 
-                                required 
-                                value={formData.width} 
-                                onChange={(e) => setFormData({...formData, width: e.target.value})} 
-                                className="w-full px-5 py-4 bg-bg-main border border-border rounded-xl focus:outline-none focus:border-brand-mel transition-all font-medium text-sm text-text-primary" 
-                                placeholder="15"
-                            />
-                        </div>
-                        <div className="space-y-2">
-                            <label className="block text-[10px] uppercase font-black text-text-secondary tracking-[0.15em] ml-1">Altura (cm) *</label>
-                            <input 
-                                type="number" 
-                                required 
-                                value={formData.height} 
-                                onChange={(e) => setFormData({...formData, height: e.target.value})} 
-                                className="w-full px-5 py-4 bg-bg-main border border-border rounded-xl focus:outline-none focus:border-brand-mel transition-all font-medium text-sm text-text-primary" 
-                                placeholder="20"
-                            />
-                        </div>
-                        <div className="space-y-2">
-                            <label className="block text-[10px] uppercase font-black text-text-secondary tracking-[0.15em] ml-1">Comprimento (cm) *</label>
-                            <input 
-                                type="number" 
-                                required 
-                                value={formData.length} 
-                                onChange={(e) => setFormData({...formData, length: e.target.value})} 
-                                className="w-full px-5 py-4 bg-bg-main border border-border rounded-xl focus:outline-none focus:border-brand-mel transition-all font-medium text-sm text-text-primary" 
-                                placeholder="15"
-                            />
-                        </div>
                     </div>
                 </div>
 

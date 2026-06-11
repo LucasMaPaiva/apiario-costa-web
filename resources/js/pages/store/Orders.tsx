@@ -28,6 +28,7 @@ export default function MyOrders() {
         const colors: any = {
             'pending': 'bg-yellow-500/10 text-yellow-600 border-yellow-500/20',
             'processing': 'bg-blue-500/10 text-blue-600 border-blue-500/20',
+            'ready_for_pickup': 'bg-orange-500/10 text-orange-600 border-orange-500/20',
             'shipped': 'bg-brand-mel/10 text-brand-mel border-brand-mel/20',
             'delivered': 'bg-green-500/10 text-green-600 border-green-500/20',
             'cancelled': 'bg-red-500/10 text-red-600 border-red-500/20',
@@ -39,6 +40,7 @@ export default function MyOrders() {
         const labels: any = {
             'pending': 'Pendente',
             'processing': 'Preparando',
+            'ready_for_pickup': 'Pronto para Retirada',
             'shipped': 'Enviado',
             'delivered': 'Entregue',
             'cancelled': 'Cancelado',

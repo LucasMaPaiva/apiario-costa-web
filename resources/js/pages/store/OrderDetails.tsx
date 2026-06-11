@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, Link, useSearchParams } from 'react-router-dom';
-import { Package, Truck, CreditCard, MapPin, ArrowLeft, ExternalLink, Calendar, Hash, ShoppingBag, CheckCircle2, XCircle, Clock, Loader2, MessageCircle } from 'lucide-react';
+import { Package, Truck, CreditCard, MapPin, ArrowLeft, ExternalLink, Calendar, Hash, ShoppingBag, CheckCircle2, XCircle, Clock, Loader2, MessageCircle, Store } from 'lucide-react';
 import httpClient from '../../common/services/httpClient';
 import { motion } from 'motion/react';
 import { formatBRL } from '../../common/utils/formatBRL';
@@ -65,6 +65,7 @@ export default function OrderDetails() {
             'pending': { label: 'Pendente', color: 'text-yellow-600', bg: 'bg-yellow-500/10', icon: <Clock size={20} /> },
             'paid': { label: 'Pago', color: 'text-green-600', bg: 'bg-green-500/10', icon: <CheckCircle2 size={20} /> },
             'processing': { label: 'Em Preparação', color: 'text-blue-600', bg: 'bg-blue-500/10', icon: <Package size={20} /> },
+            'ready_for_pickup': { label: 'Pronto para Retirada', color: 'text-orange-600', bg: 'bg-orange-500/10', icon: <Store size={20} /> },
             'shipped': { label: 'Enviado', color: 'text-brand-mel', bg: 'bg-brand-mel/10', icon: <Truck size={20} /> },
             'delivered': { label: 'Entregue', color: 'text-green-600', bg: 'bg-green-500/10', icon: <CheckCircle2 size={20} /> },
             'cancelled': { label: 'Cancelado', color: 'text-red-600', bg: 'bg-red-500/10', icon: <XCircle size={20} /> },

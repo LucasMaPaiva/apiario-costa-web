@@ -94,6 +94,7 @@ export default function AdminOrderDetails() {
                                     <option value="pending">Pendente</option>
                                     <option value="paid">Pago (Aguardando Envio)</option>
                                     <option value="processing">Em Preparação</option>
+                                    <option value="ready_for_pickup">Pronto para Retirada</option>
                                     <option value="shipped">Enviado</option>
                                     <option value="delivered">Entregue</option>
                                     <option value="cancelled">Cancelado</option>

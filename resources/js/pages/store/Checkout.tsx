@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import httpClient from '../../common/services/httpClient';
 import { useCart } from '../../modules/cart/context/CartContext';
-import { createOrder, OrderData } from '../../modules/orders/services/orderService';
+import { createOrder, createPaymentPreference, OrderData } from '../../modules/orders/services/orderService';
 import { ShoppingBag, ArrowLeft, CheckCircle2, Loader2, MapPin, Truck, CreditCard } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'motion/react';
@@ -133,12 +133,13 @@ export default function Checkout() {
         };
 
         try {
-            await createOrder(order_data);
-            setSuccess(true);
+            const order = await createOrder(order_data);
+            const { checkout_url } = await createPaymentPreference(order.id);
             clearCart();
+            window.location.href = checkout_url;
         } catch (err: any) {
-            setError(err.response?.data?.message || 'Erro ao processar pedido. Verifique se você está logado.');
-        } finally {
+            const msg = err.response?.data?.message || 'Erro ao processar pedido. Tente novamente.';
+            setError(msg);
             setLoading(false);
         }
     };
@@ -359,14 +360,23 @@ export default function Checkout() {
                                 )}
                             </section>
 
-                            <section className="bg-surface p-8 rounded-3xl shadow-sm border border-border opacity-60 pointer-events-none">
-                                <div className="flex items-center gap-3 mb-4">
-                                    <div className="w-10 h-10 bg-bg-main rounded-xl flex items-center justify-center text-text-secondary">
+                            <section className="bg-surface p-8 rounded-3xl shadow-sm border border-border">
+                                <div className="flex items-center gap-3 mb-6">
+                                    <div className="w-10 h-10 bg-bg-main rounded-xl flex items-center justify-center text-brand-mel">
                                         <CreditCard size={20} />
                                     </div>
                                     <h2 className="text-xl font-black italic text-text-primary tracking-tight">Pagamento</h2>
                                 </div>
-                                <p className="text-xs italic text-text-secondary">Integração de pagamento pendente. O pedido será processado como pagamento na entrega ou manual.</p>
+                                <div className="flex items-center gap-4 p-4 bg-bg-main rounded-2xl border border-border">
+                                    <img
+                                        src="https://http2.mlstatic.com/frontend-assets/ui-navigation/5.19.5/mercadopago/logo__large@2x.png"
+                                        alt="Mercado Pago"
+                                        className="h-7 object-contain"
+                                    />
+                                    <p className="text-xs text-text-secondary italic leading-relaxed">
+                                        Você será redirecionado para o Mercado Pago para concluir o pagamento com segurança — cartão, Pix, boleto e mais.
+                                    </p>
+                                </div>
                             </section>
                         </form>
                     </div>
@@ -418,7 +428,7 @@ export default function Checkout() {
                                     disabled={loading || cart.length === 0}
                                     className="w-full mt-8 py-5 bg-brand-mel text-brand-white text-[10px] uppercase tracking-[0.3em] font-black rounded-2xl hover:bg-brand-gold hover:scale-[1.02] transition-all disabled:opacity-50 shadow-xl shadow-black/20"
                                 >
-                                    {loading ? 'PROCESSANDO...' : 'CONFIRMAR PEDIDO'}
+                                    {loading ? 'AGUARDE...' : 'CONFIRMAR E PAGAR'}
                                 </button>
                             </div>
 

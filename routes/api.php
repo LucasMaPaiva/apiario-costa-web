@@ -30,6 +30,9 @@ Route::post('/login', [AuthController::class, 'login']);
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth:sanctum');
 
+// Webhook do Mercado Pago (público, sem autenticação)
+Route::post('/payments/webhook', [App\Http\Controllers\PaymentController::class, 'webhook']);
+
 // Produtos e Categorias (Público)
 Route::get('/products', [ProductController::class, 'index']);
 Route::get('/products/{slug}', [ProductController::class, 'show']);
@@ -74,6 +77,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('/orders/{id}/status', [App\Http\Controllers\OrderController::class, 'updateStatus']);
     Route::put('/user/profile', [AuthController::class, 'updateProfile']);
     Route::put('/user/password', [AuthController::class, 'updatePassword']);
+
+    // Pagamento
+    Route::post('/payments/preference', [App\Http\Controllers\PaymentController::class, 'createPreference']);
 
     // Endereços
     Route::get('/addresses', [App\Http\Controllers\AddressController::class, 'index']);

@@ -30,3 +30,8 @@ export const calculateShipping = async (cep: string, items: any[]) => {
     const response = await httpClient.post('/api/shipping/calculate', { cep, items });
     return response.data.data;
 };
+
+export const createPaymentPreference = async (order_id: number): Promise<{ preference_id: string; checkout_url: string }> => {
+    const response = await httpClient.post('/api/payments/preference', { order_id });
+    return response.data.data;
+};

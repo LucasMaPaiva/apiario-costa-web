@@ -45,6 +45,7 @@ Route::middleware(['auth:sanctum', 'can:admin-access'])->group(function () {
     // Pedidos
     Route::get('/admin/orders', [App\Http\Controllers\OrderController::class, 'adminIndex']);
     Route::get('/admin/orders/{id}', [App\Http\Controllers\OrderController::class, 'adminShow']);
+    Route::patch('/admin/orders/{id}/status', [App\Http\Controllers\OrderController::class, 'updateStatus']);
     
     // Produtos
     Route::get('/admin/products', [App\Http\Controllers\ProductController::class, 'adminIndex']);

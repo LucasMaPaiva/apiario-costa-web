@@ -25,7 +25,8 @@ class SettingController extends BaseController
                 'complement' => '',
                 'neighborhood' => '',
                 'city' => '',
-                'state' => ''
+                'state' => '',
+                'place_name' => ''
             ];
 
             return self::successResponse($address);
@@ -51,6 +52,7 @@ class SettingController extends BaseController
                 'neighborhood' => 'required|string',
                 'city' => 'required|string',
                 'state' => 'required|string|max:2',
+                'place_name' => 'nullable|string',
             ]);
 
             Setting::updateOrCreate(

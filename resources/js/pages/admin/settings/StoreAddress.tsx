@@ -13,7 +13,8 @@ export default function StoreAddress() {
         complement: '',
         neighborhood: '',
         city: '',
-        state: ''
+        state: '',
+        place_name: ''
     });
 
     const load_address = async () => {
@@ -62,11 +63,21 @@ export default function StoreAddress() {
                     </div>
                     <div>
                         <h2 className="text-xl font-bold text-text-primary italic">Endereço da Loja</h2>
-                        <p className="text-xs text-text-secondary">Este endereço será usado como remetente para o cálculo de frete.</p>
+                        <p className="text-xs text-text-secondary">Este endereço será usado como remetente para o cálculo de frete e exibido para clientes que escolherem retirar no local.</p>
                     </div>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div className="md:col-span-2">
+                        <label className="block text-[10px] uppercase font-black text-brand-mel tracking-widest mb-3">Nome do Local / Prédio (opcional)</label>
+                        <input
+                            name="place_name"
+                            value={address.place_name}
+                            onChange={handle_change}
+                            className="w-full px-6 py-4 bg-bg-main border border-border rounded-2xl focus:outline-none focus:border-brand-mel transition-all text-sm font-medium"
+                            placeholder="Ex: Mercadão São Francisco"
+                        />
+                    </div>
                     <div className="md:col-span-1">
                         <label className="block text-[10px] uppercase font-black text-brand-mel tracking-widest mb-3">CEP</label>
                         <input

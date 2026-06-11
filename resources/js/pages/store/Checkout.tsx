@@ -255,6 +255,9 @@ export default function Checkout() {
                                     </div>
                                     {store_address ? (
                                         <div className="p-6 bg-bg-main rounded-2xl border border-border">
+                                            {store_address.place_name && (
+                                                <p className="text-base font-black text-brand-mel mb-1">{store_address.place_name}</p>
+                                            )}
                                             <p className="text-sm font-bold text-text-primary">
                                                 {store_address.street}, {store_address.number}
                                                 {store_address.complement && ` - ${store_address.complement}`}

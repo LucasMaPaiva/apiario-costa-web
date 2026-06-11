@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\ShippingRule;
 use App\Services\Logistics\MelhorEnvioService;
+use App\Services\Logistics\MotoboyShippingService;
 use App\Services\Logistics\ShippingRuleResolver;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -12,11 +14,14 @@ class ShippingController extends Controller
     public function __construct(
         protected MelhorEnvioService $melhorEnvio,
         protected ShippingRuleResolver $ruleResolver,
+        protected MotoboyShippingService $motoboyService,
     ) {}
 
     /**
      * Calcula o frete baseado no CEP e nos itens do carrinho.
-     * Primeiro tenta uma regra local; se nenhuma casar, cai para o Melhor Envio.
+     * Primeiro tenta uma regra local (bairro específico); depois, se for
+     * Boa Vista (RR), calcula o frete por motoboy via distância; senão tenta
+     * uma regra local genérica; se nenhuma casar, cai para o Melhor Envio.
      */
     public function calculate(Request $request)
     {
@@ -30,16 +35,26 @@ class ShippingController extends Controller
         Log::info('Shipping: cálculo solicitado.', ['cep' => $request->cep, 'items' => count($request->items)]);
 
         $rule = $this->ruleResolver->resolve($request->cep);
+
+        // Bairros com regra específica (ex.: fora do perímetro urbano de Boa Vista) têm prioridade.
+        if ($rule && $rule->neighborhood) {
+            Log::info('Shipping: regra local aplicada.', ['rule_id' => $rule->id, 'name' => $rule->name, 'price' => $rule->flat_price]);
+            return response()->json(['data' => [$this->ruleToOption($rule)]]);
+        }
+
+        // Boa Vista (RR) sem regra de bairro específica: frete por motoboy calculado pela distância.
+        $location = $this->ruleResolver->lookupCep($request->cep);
+        if ($location && strtoupper($location['uf'] ?? '') === 'RR' && $this->isBoaVista($location['city'] ?? null)) {
+            $motoboy = $this->motoboyService->calculate($location);
+            if ($motoboy) {
+                Log::info('Shipping: frete motoboy aplicado.', ['price' => $motoboy['price']]);
+                return response()->json(['data' => [$motoboy]]);
+            }
+        }
+
         if ($rule) {
             Log::info('Shipping: regra local aplicada.', ['rule_id' => $rule->id, 'name' => $rule->name, 'price' => $rule->flat_price]);
-            return response()->json(['data' => [[
-                'id' => 'local-' . $rule->id,
-                'name' => $rule->name,
-                'price' => (float) $rule->flat_price,
-                'delivery_time' => $rule->delivery_days,
-                'company' => 'Apiário Costa',
-                'company_logo' => '/logo.jpg',
-            ]]]);
+            return response()->json(['data' => [$this->ruleToOption($rule)]]);
         }
 
         $items = collect($request->items)->map(function ($item) {
@@ -81,5 +96,32 @@ class ShippingController extends Controller
             Log::error('Shipping: falha no cálculo via Melhor Envio.', ['message' => $e->getMessage()]);
             return response()->json(['message' => $e->getMessage()], 500);
         }
+    }
+
+    private function isBoaVista(?string $city): bool
+    {
+        if (!$city) return false;
+
+        $normalized = strtr(strtolower($city), [
+            'á' => 'a', 'à' => 'a', 'ã' => 'a', 'â' => 'a',
+            'é' => 'e', 'ê' => 'e',
+            'í' => 'i',
+            'ó' => 'o', 'ô' => 'o', 'õ' => 'o',
+            'ú' => 'u', 'ç' => 'c',
+        ]);
+
+        return $normalized === 'boa vista';
+    }
+
+    private function ruleToOption(ShippingRule $rule): array
+    {
+        return [
+            'id' => 'local-' . $rule->id,
+            'name' => $rule->name,
+            'price' => (float) $rule->flat_price,
+            'delivery_time' => $rule->delivery_days,
+            'company' => 'Apiário Costa',
+            'company_logo' => '/logo.jpg',
+        ];
     }
 }

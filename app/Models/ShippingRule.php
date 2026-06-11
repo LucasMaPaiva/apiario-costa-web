@@ -10,6 +10,7 @@ class ShippingRule extends Model
         'name',
         'state',
         'city',
+        'neighborhood',
         'flat_price',
         'delivery_days',
     ];

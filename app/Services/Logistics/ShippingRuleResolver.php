@@ -18,12 +18,23 @@ class ShippingRuleResolver
 
         Log::info('ShippingRule: localização resolvida.', $location);
 
+        // Prioridade: estado+município+bairro > estado+município > estado
         $rule = ShippingRule::query()
             ->where('state', $location['uf'])
             ->where(function ($q) use ($location) {
                 $q->where('city', $location['city'])->orWhereNull('city');
             })
-            ->orderByRaw('CASE WHEN city IS NULL THEN 1 ELSE 0 END')
+            ->where(function ($q) use ($location) {
+                $q->whereRaw('LOWER(neighborhood) = LOWER(?)', [$location['neighborhood'] ?? ''])
+                    ->orWhereNull('neighborhood');
+            })
+            ->orderByRaw("
+                CASE
+                    WHEN city IS NOT NULL AND neighborhood IS NOT NULL THEN 0
+                    WHEN city IS NOT NULL AND neighborhood IS NULL THEN 1
+                    ELSE 2
+                END
+            ")
             ->first();
 
         if (!$rule) {
@@ -33,7 +44,7 @@ class ShippingRuleResolver
         return $rule;
     }
 
-    private function lookupCep(string $cep): ?array
+    public function lookupCep(string $cep): ?array
     {
         $cep = preg_replace('/\D/', '', $cep);
         if (strlen($cep) !== 8) return null;
@@ -45,9 +56,10 @@ class ShippingRuleResolver
             if (isset($data['erro'])) return null;
 
             return [
-                'uf' => $data['uf'] ?? null,
-                'city' => $data['localidade'] ?? null,
+                'uf'           => $data['uf'] ?? null,
+                'city'         => $data['localidade'] ?? null,
                 'neighborhood' => $data['bairro'] ?? null,
+                'street'       => $data['logradouro'] ?? null,
             ];
         } catch (\Throwable $e) {
             return null;
